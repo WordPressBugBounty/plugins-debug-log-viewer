@@ -16,18 +16,19 @@ class FreemiusController {
                 }
                 FreemiusController::include_sdk();
                 $dbg_lv = fs_dynamic_init( [
-                    'id'             => '17350',
-                    'slug'           => 'debug-log-viewer',
-                    'type'           => 'plugin',
-                    'public_key'     => 'pk_d456c712f16510d920c9f4ba4880a',
-                    'is_premium'     => false,
-                    'has_addons'     => false,
-                    'has_paid_plans' => true,
-                    'menu'           => [
+                    'id'               => '17350',
+                    'slug'             => 'debug-log-viewer',
+                    'type'             => 'plugin',
+                    'public_key'       => 'pk_d456c712f16510d920c9f4ba4880a',
+                    'is_premium'       => false,
+                    'has_addons'       => false,
+                    'has_paid_plans'   => true,
+                    'menu'             => [
                         'slug'       => 'debug-log-viewer',
                         'first-path' => 'admin.php?page=debug-log-viewer',
                     ],
-                    'is_live'        => true,
+                    'is_live'          => true,
+                    'is_org_compliant' => true,
                 ] );
                 return $dbg_lv;
             }

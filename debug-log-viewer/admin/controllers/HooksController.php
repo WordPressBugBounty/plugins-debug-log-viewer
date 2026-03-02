@@ -24,6 +24,7 @@ class HooksController
 	public $liveUpdatesController;
 	public $notificationController;
 	public $serviceController;
+	public $cleanupController;
 
 	public function __construct()
 	{
@@ -34,6 +35,7 @@ class HooksController
 		$this->liveUpdatesController  = new LiveUpdatesController();
 		$this->notificationController = new AlertController();
 		$this->serviceController      = new ServiceController();
+		$this->cleanupController      = new CleanupController();
 	}
 
 	public function init()
@@ -76,6 +78,16 @@ class HooksController
 			$this->logController->changeDatetimeFormat();
 		});
 
+		// Timezone selection
+		add_action('wp_ajax_dbg_lv_change_timezone', function () {
+			$this->logController->changeTimezone();
+		});
+		
+		// Save cleanup settings
+		add_action('wp_ajax_dbg_lv_save_cleanup_settings', function () {
+			$this->cleanupController->saveSettings();
+		});
+
 		// Button in template
 		add_action('wp_ajax_dbg_lv_first_run_enable_logging', function () {
 			$this->logController->firstRunEnableLogging();
@@ -101,7 +113,7 @@ class HooksController
 		});
 
 		add_action('wp_ajax_dbg_lv_is_debug_log_publicly_accessible', function () {
-			$this->logController->dbg_lv_is_debug_log_publicly_accessible();
+			$this->logController->isDebugLogPubliclyAccessible();
 		});
 
 		add_action(LogController::SCHEDULE_MAIL_SEND, function ($args) {
@@ -110,6 +122,10 @@ class HooksController
 
 		add_action('wp_ajax_dbg_lv_get_alert_schedule', function () {
 			wp_send_json($this->notificationController->getNextScheduledTimeForAjax());
+		});
+
+		add_action('wp_ajax_dbg_lv_get_cleanup_schedule', function () {
+			wp_send_json($this->cleanupController->getNextScheduleTimeForAjax());
 		});
 
 		add_action('admin_init', function () {
@@ -121,7 +137,8 @@ class HooksController
 			$this->reviewController->handleUserAction();
 		});
 
-		// Uninstall / deactivate hooks
+		// Activation / deactivation / uninstall hooks
+		register_activation_hook($dbg_lv_index_file, ['DebugLogViewer\Admin\Controllers\CleanupController', 'activate']);
 		register_deactivation_hook($dbg_lv_index_file, ['DebugLogViewer\Admin\Controllers\ServiceController', 'deactivateHandler']);
 		register_uninstall_hook($dbg_lv_index_file, ['DebugLogViewer\Admin\Controllers\ServiceController', 'uninstallHandler']);
 	}

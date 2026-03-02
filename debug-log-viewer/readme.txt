@@ -4,7 +4,7 @@ Contributors: lysyiweb, freemius
 Tags: log, debugging, error log, debug
 Requires at least: 5.8
 Tested up to: 6.9
-Stable tag: 2.0.5
+Stable tag: 2.1
 Requires PHP: 7.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,7 +13,7 @@ Effortlessly view, search, filter and manage your WordPress debug.log in the adm
 
 == Tested up to ==
 WordPress Version: 6.9
-PHP Version: 8.4.1
+PHP Version: 8.3.9
 
 == Description ==
 
@@ -37,6 +37,7 @@ Key Features for Efficient WordPress Debugging:
   * Customize Logging Options: Configure your debug log settings to match your specific needs.
   * Tailor Your Error Tracking:  Personalize your debugging experience through plugin settings.
 * Custom Log Path Support:  If you've defined a custom path for your debug.log file (e.g., using define( 'WP_DEBUG_LOG', ABSPATH . 'wp-content/logs/debug.log' );), Debug Log Viewer automatically detects and reads from it.
+* Automatic Log Cleanup:  Schedule automatic cleanup to prevent your debug.log from growing too large and consuming disk space. Keep your site running smoothly with automatic maintenance at 50MB threshold.
 
 Benefits of Using Debug Log Viewer:
 
@@ -69,16 +70,24 @@ Who is Debug Log Viewer For?
 == Screenshots ==
 
 1. Main screen of the plugin interface showing the debug log viewer dashboard with error entries and filtering options.
-2. Debug Log Viewer Dashboard:  The main view provides a clear and searchable interface for Browse your WordPress debug.log file within the WordPress admin.
+2. Settings setup page
 3. Email Alerts setup page
-4. Display Errors warning modal
+4. Log file cleanup
 
 == Changelog ==
 
+= 2.1 =
+* Added Auto-Cleanup feature to automatically manage debug.log file size (Pro: configurable 1-5000MB, Free: fixed at 50MB)
+* Three cleanup methods available: Truncate (keep recent logs), Clear (remove all), Archive & Rotate (backup before clearing)
+* Added cleanup history tracking with expandable view for up to 50 entries (Pro only)
+* Various UI improvements, package upgrade and code optimizations
+
+= 2.0.7 =
+* Added ability to choose timezone for log entries
+
 = 2.0.5 =
 * Adjustments for Pro plan modal
-* Fixed alerts cron unshedule issue (thanks to Leo for the report)
-* Freemius and WP-Config-Transformer update
+* Fixed alerts cron unshedule issue (thanks to Leo for report)
 
 = 2.0.4 =
 * Security fix

@@ -22,6 +22,7 @@ try {
     import('./components/log-view/index.js')
     import('./components/tab-handler.js')
     import('./components/welcome-screen.js')
+    import('./components/cleanup-handler.js')
   }
 } catch (error) {
   console.log(error)

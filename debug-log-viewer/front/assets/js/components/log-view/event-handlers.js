@@ -170,6 +170,17 @@ export class LogViewerEventHandlers {
       // Invalidate datetime column cache and redraw to show the new format
       self.table.cells(null, 2).invalidate().draw(false)
     })
+
+    // Timezone dropdown
+    $('#dbg_lv_timezone').on('change', async function () {
+      const selectedTimezone = $(this).val()
+
+      await self.api.changeTimezone(selectedTimezone)
+
+      // Clear table and reload data from server to get re-formatted datetime with new timezone
+      self.table.clear()
+      await self.api.fillInitialData()
+    })
   }
 
   /**

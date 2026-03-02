@@ -7,14 +7,13 @@ $(document).ready(function () {
   const apiService = new LogViewerApiService()
 
   // Handle start debugging button hover effects
-  $('#first_run_enable_logging').hover(
-    function () {
+  $('#first_run_enable_logging')
+    .on('mouseenter', function () {
       $(this).addClass('btn-hover-effect')
-    },
-    function () {
+    })
+    .on('mouseleave', function () {
       $(this).removeClass('btn-hover-effect')
-    }
-  )
+    })
 
   // Handle start debugging button click with loading state
   $('#first_run_enable_logging').on('click', async function () {

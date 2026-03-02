@@ -28,23 +28,29 @@ $dbg_lv_is_alerts_active = in_array($dbg_lv_current_tab, $dbg_lv_valid_tabs, tru
 
 		<div class="alerts section">
 
-			<!-- Dynamic next email info container -->
-			<div id="next-email-info" class="next-email-info">
-				<p style="margin: 0; color: #0073aa;">
-					<strong id="next-email-time"></strong>
-					<small id="next-email-countdown"></small>
-				</p>
-			</div>
+			<p>
+				<?php
+				if (dbg_lv()->is_premium()): ?>
+					<?php esc_html_e('Get alerts for the error levels you choose. You have full control over your notifications.', 'debug-log-viewer'); ?>
+				<?php else: ?>
+					<?php esc_html_e('By default, you will be notified about serious problems. Upgrade to Pro to choose specific error levels and reduce noise.', 'debug-log-viewer'); ?>
+				<?php endif; ?>
+			</p>
+
+			<!-- Next Email Schedule Info -->
+			<?php
+			$id = 'next-email-info';
+			$is_scheduled = false; // Will be populated via JavaScript
+			$next_run_human = '';
+			$label = __('Next check:', 'debug-log-viewer');
+			$class = 'next-email-info';
+			$dynamic = true; // Enable dynamic JavaScript updates
+			include plugin_dir_path(__DIR__) . 'components/next-schedule-info.tpl.php';
+			?>
+
 			<?php $dbg_lv_notificator = new AlertController(); ?>
 			<form class="form-group" id="dbg_lv_log_viewer_alerts_form" data-alerts-enabled="<?php echo esc_attr($dbg_lv_notificator->isEnabled() ? 'true' : 'false'); ?>">
-				<p>
-					<?php 
-					if (dbg_lv()->is_premium()): ?>
-						<?php esc_html_e('Get alerts for the error levels you choose. You have full control over your notifications.', 'debug-log-viewer'); ?>
-					<?php else: ?>
-						<?php esc_html_e('By default, you will be notified about serious problems. Upgrade to Pro to choose specific error levels and reduce noise.', 'debug-log-viewer'); ?>
-					<?php endif; ?>
-				</p>
+
 
 
 				<p><?php esc_html_e('Configure your email settings and select which error levels you want to monitor', 'debug-log-viewer'); ?></p>
@@ -61,9 +67,9 @@ $dbg_lv_is_alerts_active = in_array($dbg_lv_current_tab, $dbg_lv_valid_tabs, tru
 						}
 						foreach ($dbg_lv_emails as $dbg_lv_index => $dbg_lv_email) :
 						?>
-						<div class="email-input-row" data-index="<?php echo esc_attr($dbg_lv_index); ?>">
-							<input type="email" name="emails[]" value="<?php echo esc_attr($dbg_lv_email); ?>" disabled />
-							<?php if ($dbg_lv_index === 0) : ?>
+							<div class="email-input-row" data-index="<?php echo esc_attr($dbg_lv_index); ?>">
+								<input type="email" name="emails[]" value="<?php echo esc_attr($dbg_lv_email); ?>" disabled />
+								<?php if ($dbg_lv_index === 0) : ?>
 									<button type="button" class="btn btn-outline-primary btn-sm add-email-btn" title="<?php esc_attr_e('Add another email', 'debug-log-viewer'); ?>" disabled>+</button>
 								<?php else : ?>
 									<button type="button" class="btn btn-outline-danger btn-sm remove-email-btn" title="<?php esc_attr_e('Remove this email', 'debug-log-viewer'); ?>" disabled>-</button>
@@ -79,7 +85,6 @@ $dbg_lv_is_alerts_active = in_array($dbg_lv_current_tab, $dbg_lv_valid_tabs, tru
 
 					<!-- Error Levels Section -->
 					<div class="alerts-section mt-4 <?php echo !dbg_lv()->is_premium() ? 'pro-feature-section' : ''; ?>">
-						<label><?php esc_html_e('Notify me about:', 'debug-log-viewer'); ?></label>
 
 						<?php if (!dbg_lv()->is_premium()): ?>
 							<div class="pro-feature-notice">
@@ -90,16 +95,17 @@ $dbg_lv_is_alerts_active = in_array($dbg_lv_current_tab, $dbg_lv_valid_tabs, tru
 								</p>
 							</div>
 						<?php endif; ?>
+						<label><?php esc_html_e('Notify me about:', 'debug-log-viewer'); ?></label>
 						<div class="togglers-group <?php echo !dbg_lv()->is_premium() ? 'pro-disabled' : ''; ?>">
 							<?php
 							$dbg_lv_available_levels = $dbg_lv_notificator->getAllAvailableLevels();
 							$dbg_lv_selected_levels = $dbg_lv_notificator->getSelectedLevels();
-							
+
 							// For free users, show only critical error levels as default/preview
 							if (!dbg_lv()->is_premium()) {
 								$dbg_lv_available_levels = array_slice($dbg_lv_available_levels, 0, 4, true); // Show only first 4 levels as preview
 							}
-							
+
 							foreach ($dbg_lv_available_levels as $dbg_lv_level => $dbg_lv_label) :
 								$dbg_lv_is_checked = in_array($dbg_lv_level, $dbg_lv_selected_levels) ? 'checked' : '';
 								$dbg_lv_toggle_id = 'dbg_lv_toggle_level_' . esc_attr($dbg_lv_level);
@@ -115,10 +121,10 @@ $dbg_lv_is_alerts_active = in_array($dbg_lv_current_tab, $dbg_lv_valid_tabs, tru
 										<?php echo esc_attr($dbg_lv_is_checked); ?>
 										<?php echo esc_attr($dbg_lv_is_disabled); ?> />
 									<label class="form-check-label" for="<?php echo esc_attr($dbg_lv_toggle_id); ?>"><?php echo esc_html($dbg_lv_label); ?></label>
-									
+
 								</div>
 							<?php endforeach; ?>
-							
+
 							<?php if (!dbg_lv()->is_premium()): ?>
 								<div class="log-info-block form-switch pro-preview">
 									<span class="preview-text">

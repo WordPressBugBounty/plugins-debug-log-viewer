@@ -2,11 +2,11 @@
 import { showToast, t } from '../../utils.js'
 
 export class LogViewerApiService {
-  constructor(table) {
+  constructor (table) {
     this.table = table
   }
 
-  async fillInitialData() {
+  async fillInitialData () {
     try {
       const rawResponse = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_run_live_updates',
@@ -26,7 +26,7 @@ export class LogViewerApiService {
     }
   }
 
-  async updateLogs(onBeforeUpdate) {
+  async updateLogs (onBeforeUpdate) {
     try {
       if (onBeforeUpdate) onBeforeUpdate()
 
@@ -52,7 +52,7 @@ export class LogViewerApiService {
     }
   }
 
-  async toggleDebugMode(isChecked) {
+  async toggleDebugMode (isChecked) {
     try {
       const response = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_toggle_debug_mode',
@@ -73,7 +73,7 @@ export class LogViewerApiService {
     }
   }
 
-  async toggleDebugScripts(isChecked) {
+  async toggleDebugScripts (isChecked) {
     try {
       const response = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_toggle_debug_scripts',
@@ -94,7 +94,7 @@ export class LogViewerApiService {
     }
   }
 
-  async toggleLogInFile(isChecked) {
+  async toggleLogInFile (isChecked) {
     try {
       const response = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_toggle_log_in_file',
@@ -114,7 +114,7 @@ export class LogViewerApiService {
     }
   }
 
-  async toggleDisplayErrors(isChecked) {
+  async toggleDisplayErrors (isChecked) {
     try {
       const response = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_toggle_display_errors',
@@ -135,7 +135,7 @@ export class LogViewerApiService {
     }
   }
 
-  async isDebugLogPubliclyAccessible() {
+  async isDebugLogPubliclyAccessible () {
     try {
       const response = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_is_debug_log_publicly_accessible',
@@ -153,7 +153,7 @@ export class LogViewerApiService {
     }
   }
 
-  async enableLogging() {
+  async enableLogging () {
     const response = await jQuery.post(ajaxurl, {
       action: 'dbg_lv_first_run_enable_logging',
       wp_nonce: dbg_lv_backend_data.ajax_nonce
@@ -166,7 +166,7 @@ export class LogViewerApiService {
     return response
   }
 
-  async clearLog() {
+  async clearLog () {
     try {
       if (!confirm(t('flush_log_confirmation'))) {
         return null
@@ -189,7 +189,7 @@ export class LogViewerApiService {
     }
   }
 
-  downloadLog() {
+  downloadLog () {
     jQuery.post({
       url: ajaxurl,
       data: {
@@ -218,7 +218,7 @@ export class LogViewerApiService {
     })
   }
 
-  async changeLogsUpdateMode(mode) {
+  async changeLogsUpdateMode (mode) {
     try {
       const response = await jQuery.post({
         url: ajaxurl,
@@ -237,13 +237,34 @@ export class LogViewerApiService {
     }
   }
 
-  async changeDatetimeFormat(format) {
+  async changeDatetimeFormat (format) {
     try {
       const response = await jQuery.post({
         url: ajaxurl,
         data: {
           action: 'dbg_lv_change_datetime_format',
           format,
+          wp_nonce: dbg_lv_backend_data.ajax_nonce
+        }
+      })
+
+      if (!response.success) {
+        throw new Error(response.data)
+      }
+      showToast(response.data, 'success')
+    } catch (error) {
+      showToast(error, 'error')
+      throw error
+    }
+  }
+
+  async changeTimezone (timezone) {
+    try {
+      const response = await jQuery.post({
+        url: ajaxurl,
+        data: {
+          action: 'dbg_lv_change_timezone',
+          timezone,
           wp_nonce: dbg_lv_backend_data.ajax_nonce
         }
       })

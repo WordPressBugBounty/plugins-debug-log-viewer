@@ -73,7 +73,7 @@ trait ScheduleTrait {
 
 	public function dbg_lv_change_notifications_status() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
+		$this->verifyAjaxRequest();
 
 		try {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing

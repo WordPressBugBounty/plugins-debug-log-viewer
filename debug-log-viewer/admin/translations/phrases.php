@@ -112,7 +112,16 @@ class Phrases {
 				'megabytes'                    => __('megabytes', 'debug-log-viewer'),
 				'gigabytes'                    => __('gigabytes', 'debug-log-viewer'),
 
-				'upgrade_to_pro'               => __('Upgrade to Pro', 'debug-log-viewer')
+				'upgrade_to_pro'               => __('Upgrade to Pro', 'debug-log-viewer'),
+
+				// Cleanup phrases
+				'settings_saved_successfully'  => __('Settings saved successfully!', 'debug-log-viewer'),
+				'failed_to_save_settings'      => __('Failed to save settings.', 'debug-log-viewer'),
+				'error_saving_settings'        => __('An error occurred while saving settings.', 'debug-log-viewer'),
+				'running'                      => __('Running...', 'debug-log-viewer'),
+				'cleanup_completed'            => __('Cleanup completed successfully!', 'debug-log-viewer'),
+				'cleanup_failed'               => __('Cleanup failed.', 'debug-log-viewer'),
+				'error_during_cleanup'         => __('An error occurred during cleanup.', 'debug-log-viewer')
 			];
 		}
 	}

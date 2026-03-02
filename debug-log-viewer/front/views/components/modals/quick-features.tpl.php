@@ -23,6 +23,7 @@ if (!defined('ABSPATH')) {
 				<ul class="list-unstyled mb-3">
 					<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Export logs to CSV', 'debug-log-viewer'); ?></li>
 					<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Email alerts for errors', 'debug-log-viewer'); ?></li>
+					<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Auto-cleanup with configurable methods', 'debug-log-viewer'); ?></li>
 					<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Custom time range filters', 'debug-log-viewer'); ?></li>
 					<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Choose specific error levels to monitor', 'debug-log-viewer'); ?></li>
 					<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Priority support', 'debug-log-viewer'); ?></li>

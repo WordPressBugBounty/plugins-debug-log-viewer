@@ -25,6 +25,7 @@ class LogModel
 	const LAST_POSITION_OPTION_NAME    = 'dbg_lv_log_last_position';
 	const LOG_UPDATES_MODE_OPTION_NAME = 'dbg_lv_log_updates_mode';
 	const DATETIME_FORMAT_OPTION_NAME  = 'dbg_lv_datetime_format';
+	const TIMEZONE_OPTION_NAME         = 'dbg_lv_timezone';
 	const DATETIME_FORMAT_ABSOLUTE     = 'ABSOLUTE';
 	const DATETIME_FORMAT_RELATIVE     = 'RELATIVE';
 	const LOG_FILE_LIMIT               = 10 * 1024 * 1024; // 10 MB
@@ -214,6 +215,63 @@ class LogModel
 		return isset($matches[0][1]) ? $matches[0][1] : '';
 	}
 
+	public static function getDateTimeZone( $timezone_string = '' ) {
+		if ( empty( $timezone_string ) ) {
+			return wp_timezone();
+		}
+		
+		try {
+			return new \DateTimeZone( $timezone_string );
+		} catch ( \Exception $e ) {
+			if ( preg_match( '/^UTC([+-])?([0-9]+(?:\.[0-9]+)?)$/', $timezone_string, $matches ) ) {
+				$offset = (float) $matches[2];
+				if ( isset( $matches[1] ) && '-' === $matches[1] ) {
+					$offset = -$offset;
+				}
+				
+				$hours   = (int) $offset;
+				$minutes = abs( ( $offset - $hours ) * 60 );
+				$sign    = $offset >= 0 ? '+' : '-';
+				
+				$offset_string = sprintf( '%s%02d:%02d', $sign, abs( $hours ), $minutes );
+				
+				try {
+					return new \DateTimeZone( $offset_string );
+				} catch ( \Exception $e2 ) {
+					return false;
+				}
+			}
+			return false;
+		}
+	}
+
+	public static function formatDatetimeWithTimezone( $datetime ) {
+		if ( empty( $datetime ) ) {
+			return $datetime;
+		}
+
+		$selected_timezone = get_user_meta( get_current_user_id(), self::TIMEZONE_OPTION_NAME, true );
+		$timezone_string   = $selected_timezone ?: wp_timezone_string();
+
+		try {
+			$dt = new \DateTime( $datetime );
+			
+			$target_timezone = self::getDateTimeZone( $timezone_string );
+			if ( false === $target_timezone ) {
+				return $datetime;
+			}
+			
+			$dt->setTimezone( $target_timezone );
+			
+			$date_format = get_option( 'date_format' );
+			$time_format = get_option( 'time_format' );
+			
+			return $dt->format( $date_format . ' ' . $time_format );
+		} catch ( \Exception $e ) {
+			return $datetime;
+		}
+	}
+
 	public static function getLine( $row ) {
 		preg_match_all('/(on line |php:)(\d{1,})/m', $row, $matches, PREG_SET_ORDER, 0);
 		return isset($matches[0][2]) ? $matches[0][2] : '';
@@ -282,6 +340,168 @@ class LogModel
 				: round($filesizeInMegabytes, 2);
 		} else {
 			return 0;
+		}
+	}
+
+	/**
+	 * Write content to log file safely
+	 *
+	 * @param string $filename File path
+	 * @param string $content Content to write
+	 * @param bool $append Whether to append or truncate
+	 * @return array Result with success status and message
+	 */
+	public function writeToFile($filename, $content, $append = false) {
+		if (!file_exists($filename)) {
+			return [
+				'success' => false,
+				'message' => 'File does not exist: ' . $filename,
+			];
+		}
+
+		if (!is_writable($filename)) {
+			return [
+				'success' => false,
+				'message' => 'File is not writable: ' . $filename,
+			];
+		}
+
+		$mode = $append ? 'a' : 'w';
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fopen
+		$handle = fopen($filename, $mode);
+
+		if (false === $handle) {
+			return [
+				'success' => false,
+				'message' => 'Failed to open file for writing',
+			];
+		}
+
+		$bytes_written = fwrite($handle, $content);
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose
+		fclose($handle);
+
+		if (false === $bytes_written) {
+			return [
+				'success' => false,
+				'message' => 'Failed to write to file',
+			];
+		}
+
+		return [
+			'success' => true,
+			'bytes_written' => $bytes_written,
+		];
+	}
+
+	/**
+	 * Copy file safely with error handling
+	 *
+	 * @param string $source Source file path
+	 * @param string $destination Destination file path
+	 * @return array Result with success status and message
+	 */
+	public function copyFile($source, $destination) {
+		if (!file_exists($source)) {
+			return [
+				'success' => false,
+				'message' => 'Source file does not exist: ' . $source,
+			];
+		}
+
+		if (!is_readable($source)) {
+			return [
+				'success' => false,
+				'message' => 'Source file is not readable: ' . $source,
+			];
+		}
+
+		try {
+			if (!copy($source, $destination)) {
+				return [
+					'success' => false,
+					'message' => 'Failed to copy file',
+				];
+			}
+
+			// Set proper permissions on the copied file
+			$chmod_result = chmod($destination, 0644);
+			if (!$chmod_result) {
+				// Log warning but don't fail the operation
+				error_log('Debug Log Viewer: Warning - Failed to set permissions on copied file: ' . $destination);
+			}
+
+			return [
+				'success' => true,
+				'destination' => $destination,
+			];
+		} catch (\Exception $e) {
+			return [
+				'success' => false,
+				'message' => 'Exception during file copy: ' . $e->getMessage(),
+			];
+		}
+	}
+
+	/**
+	 * Delete file safely with error handling
+	 *
+	 * @param string $filename File path to delete
+	 * @return array Result with success status and message
+	 */
+	public function deleteFile($filename) {
+		if (!file_exists($filename)) {
+			return [
+				'success' => true,
+				'message' => 'File does not exist (already deleted)',
+			];
+		}
+
+		if (!is_writable($filename)) {
+			return [
+				'success' => false,
+				'message' => 'File is not writable/deletable: ' . $filename,
+			];
+		}
+
+		if (wp_delete_file($filename)) {
+			return [
+				'success' => true,
+				'message' => 'File deleted successfully',
+			];
+		} else {
+			return [
+				'success' => false,
+				'message' => 'Failed to delete file: ' . $filename,
+			];
+		}
+	}
+
+	/**
+	 * Set file permissions safely
+	 *
+	 * @param string $filename File path
+	 * @param int $permissions Octal permissions (e.g., 0644)
+	 * @return array Result with success status and message
+	 */
+	public function setPermissions($filename, $permissions = 0644) {
+		if (!file_exists($filename)) {
+			return [
+				'success' => false,
+				'message' => 'File does not exist: ' . $filename,
+			];
+		}
+
+		if (chmod($filename, $permissions)) {
+			return [
+				'success' => true,
+				'permissions' => decoct($permissions),
+			];
+		} else {
+			return [
+				'success' => false,
+				'message' => 'Failed to set permissions on file: ' . $filename,
+			];
 		}
 	}
 }

@@ -14,5 +14,5 @@ class Constants {
 	const SIX_MONTH_IN_SECONDS = 15552000; // 180 * 24 * 60 * 60 (6 months as 180 days)
 	const ONE_YEAR_IN_SECONDS  = 31536000; // 365 * 24 * 60 * 60 (1 year)
 
-	const CONTROLLERS_LIST = [ 'Hooks', 'Menu', 'Service', 'Log', 'Alert', 'Review', 'Freemius' ];
+	const CONTROLLERS_LIST = [ 'Hooks', 'Menu', 'Service', 'Log', 'Alert', 'Review', 'Freemius', 'Cleanup' ];
 }

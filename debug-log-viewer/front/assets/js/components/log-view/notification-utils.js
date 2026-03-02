@@ -1,9 +1,9 @@
 /* global jQuery, ajaxurl, dbg_lv_backend_data */
 import { showToast, t } from '../../utils.js'
-import { NotificationScheduleManager } from './notification-schedule.js'
+import { ScheduleManager } from '../schedule-manager.js'
 import { EmailRecipientsManager } from './email-recipients-manager.js'
 
-const scheduleManager = new NotificationScheduleManager()
+const scheduleManager = new ScheduleManager('next-email-info', 'dbg_lv_get_alert_schedule')
 let emailRecipientsManager = null
 
 /**

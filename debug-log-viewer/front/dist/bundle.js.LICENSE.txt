@@ -92,7 +92,7 @@
  * © SpryMedia Ltd - datatables.net/license
  */
 
-/*! Buttons for DataTables 3.2.2
+/*! Buttons for DataTables 3.2.6
  * © SpryMedia Ltd - datatables.net/license
  */
 
@@ -100,10 +100,10 @@
  * © SpryMedia Ltd - datatables.net/license
  */
 
-/*! SearchBuilder 1.8.2
+/*! SearchBuilder 1.8.4
      * ©SpryMedia Ltd - datatables.net/license/mit
      */
 
-/*! SearchBuilder 1.8.2
+/*! SearchBuilder 1.8.4
  * ©SpryMedia Ltd - datatables.net/license/mit
  */

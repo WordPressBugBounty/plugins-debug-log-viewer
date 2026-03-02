@@ -59,6 +59,12 @@ class LogView
 								<i class="fa-solid fa-message"></i>
 								<span><?php esc_html_e('Alerts', 'debug-log-viewer'); ?></span>
 							</button>
+							<button class="tab-button <?php echo $current_tab === 'cleanup' ? 'active' : ''; ?>"
+								id="cleanup-tab-btn"
+								type="button">
+								<i class="fa-solid fa-broom"></i>
+								<span><?php esc_html_e('Cleanup', 'debug-log-viewer'); ?></span>
+							</button>
 						</div>
 					</div>
 					<div class="header-right">
@@ -85,6 +91,7 @@ class LogView
 		<?php include_once realpath(__DIR__) . '/log-view.tpl.php'; ?>
 		<?php include_once realpath(__DIR__) . '/alerts.tpl.php'; ?>
 		<?php include_once realpath(__DIR__) . '/settings.tpl.php'; ?>
+		<?php include_once realpath(__DIR__) . '/cleanup.tpl.php'; ?>
 
 		<?php require_once realpath(__DIR__) . '/../components/toast.tpl.php'; ?>
 

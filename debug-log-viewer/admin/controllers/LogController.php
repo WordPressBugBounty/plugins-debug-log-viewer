@@ -11,6 +11,7 @@ use DebugLogViewer\Admin\Models\LogModel;
 use DebugLogViewer\Admin\Helpers\Utils;
 
 require_once realpath(__DIR__) . '/../../vendor/autoload.php';
+require_once realpath(__DIR__) . '/BaseController.php';
 require_once realpath(__DIR__) . '/LiveUpdatesController.php';
 require_once realpath(__DIR__) . '/../../admin/models/LogModel.php';
 require_once realpath(__DIR__) . '/../../front/views/pages/index.tpl.php';
@@ -18,7 +19,7 @@ require_once realpath(__DIR__) . '/../../admin/helpers/utils.php';
 require_once realpath(__DIR__) . '/../../admin/traits/ScheduleTrait.php';
 require_once realpath(__DIR__) . '/../../admin/services/Email.php';
 
-class LogController {
+class LogController extends BaseController {
 
 	use ScheduleTrait;
 
@@ -52,8 +53,7 @@ class LogController {
 
 	public function firstRunEnableLogging() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		try {
 
@@ -78,8 +78,7 @@ class LogController {
 
 	public function toggleDebugMode() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		$state = $this->dbg_lv_prepare_state();
 
@@ -96,8 +95,7 @@ class LogController {
 
 	public function toggleDebugScripts() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		$state = $this->dbg_lv_prepare_state();
 
@@ -114,8 +112,7 @@ class LogController {
 
 	public function toggleLogInFile() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		$state = $this->dbg_lv_prepare_state();
 
@@ -136,8 +133,7 @@ class LogController {
 
 	public function toggleDisplayErrors() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		$state = $this->dbg_lv_prepare_state();
 
@@ -158,8 +154,7 @@ class LogController {
 
 	public function clear() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		try {
 			$path = $this->getLogFilePath();
@@ -185,8 +180,7 @@ class LogController {
 	public function download() {
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		try {
 			$path = $this->getLogFilePath();
@@ -216,9 +210,9 @@ class LogController {
 		}
 	}
 
-	public static function getCurrentUserEmail() {
+	public function getCurrentUserEmail() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
+		$this->verifyAjaxRequest();
 
 		try {
 			global $current_user;
@@ -230,9 +224,6 @@ class LogController {
 	}
 
 	public function dbg_lv_prepare_state() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-
 		if (!isset($_POST['state'])) {
 			throw new \Exception('Empty state passed');
 		}
@@ -311,8 +302,7 @@ class LogController {
 
 	public function changeLogsUpdateMode() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		$mode = isset($_POST['mode']) ? sanitize_text_field(wp_unslash($_POST['mode'])) : null;
 
@@ -342,8 +332,7 @@ class LogController {
 
 	public function changeDatetimeFormat() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		$format = isset($_POST['format']) ? sanitize_text_field(wp_unslash($_POST['format'])) : null;
 
@@ -371,10 +360,28 @@ class LogController {
 		}
 	}
 
-	public function dbg_lv_is_debug_log_publicly_accessible() {
+	/**
+	 * Handle timezone change request.
+	 *
+	 * @return void
+	 */
+	public function changeTimezone() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
+
+		$timezone = isset($_POST['timezone']) ? sanitize_text_field(wp_unslash($_POST['timezone'])) : null;
+
+		if ($timezone === null || (!empty($timezone) && false === LogModel::getDateTimeZone($timezone))) {
+			wp_send_json_error('Invalid timezone', 400);
+		}
+
+		update_user_meta(get_current_user_id(), LogModel::TIMEZONE_OPTION_NAME, $timezone);
+		wp_send_json_success(__('Timezone updated', 'debug-log-viewer'));
+	}
+
+	public function isDebugLogPubliclyAccessible() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->verifyAjaxRequest();
 
 		try {
 			$path = $this->getLogFilePath();
@@ -452,7 +459,8 @@ class LogController {
 				'icon' => 'fa-database',
 				'type' => 'warning',
 				'title' => __('Large File Size', 'debug-log-viewer'),
-				'message' => sprintf(__('The file exceeds the %s limit, only the last %s will be displayed.', 'debug-log-viewer'), $limit, $limit)
+				/* translators: %1$s: file size limit, %2$s: amount of content displayed */
+				'message' => sprintf(__('The file exceeds the %1$s limit, only the last %2$s will be displayed.', 'debug-log-viewer'), $limit, $limit)
 			];
 		}
 

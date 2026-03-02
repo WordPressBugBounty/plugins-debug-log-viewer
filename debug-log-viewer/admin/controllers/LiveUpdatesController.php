@@ -9,7 +9,9 @@ if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
-class LiveUpdatesController {
+require_once realpath(__DIR__) . '/BaseController.php';
+
+class LiveUpdatesController extends BaseController {
 
 
 	public const LIVE_UPDATE_INTERVAL    = 5; // seconds
@@ -19,8 +21,7 @@ class LiveUpdatesController {
 
 	public function run() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
-		Utils::verifyNonce(isset($_POST['wp_nonce']) ? sanitize_text_field(wp_unslash($_POST['wp_nonce'])) : '');
-		Utils::verifyAdminCapability();
+		$this->verifyAjaxRequest();
 
 		$logModel = new LogModel();
 
@@ -51,9 +52,12 @@ class LiveUpdatesController {
 			if (empty($row)) {
 				return;
 			}
+			
+			$datetime = LogModel::getDatetime($row);
+			
 			return [
-				'timestamp'   => strtotime(LogModel::getDatetime($row)) * 1000,
-				'datetime'    => LogModel::getDatetime($row),
+				'timestamp'   => strtotime($datetime) * 1000,
+				'datetime'    => LogModel::formatDatetimeWithTimezone($datetime),
 				'line'        => LogModel::getLine($row),
 				'file'        => LogModel::getFile($row),
 				'type'        => LogModel::getType($row),

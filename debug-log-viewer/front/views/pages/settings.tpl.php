@@ -26,7 +26,7 @@ use DebugLogViewer\Admin\Models\LogModel;
 			}
 			?>
 
-			<form class="form-group mt-3" id="dbg_lv_log_viewer_settings_form">
+			<form class="form-group mt-3" id="dbg_lv_log_viewer_settings_form" onsubmit="return false">
 
 				<div class="settings-group mb-4">
 					<label class="settings-group-title">
@@ -41,7 +41,7 @@ use DebugLogViewer\Admin\Models\LogModel;
 						<label class="form-check-label">
 							<input class="form-check-input"
 								value="<?php echo esc_attr('MANUAL'); ?>"
-							<?php checked($dbg_lv_selected_mode, 'MANUAL'); ?>
+								<?php checked($dbg_lv_selected_mode, 'MANUAL'); ?>
 								type="radio"
 								name="UpdatesModeRadioOptions"
 								id="<?php echo esc_attr('UpdatesModeRadioOptionsManual'); ?>">
@@ -54,7 +54,7 @@ use DebugLogViewer\Admin\Models\LogModel;
 						<label class="form-check-label">
 							<input class="form-check-input"
 								value="<?php echo esc_attr('AUTO'); ?>"
-							<?php checked($dbg_lv_selected_mode, 'AUTO'); ?>
+								<?php checked($dbg_lv_selected_mode, 'AUTO'); ?>
 								type="radio"
 								name="UpdatesModeRadioOptions"
 								id="<?php echo esc_attr('UpdatesModeRadioOptionsAuto'); ?>">
@@ -77,7 +77,7 @@ use DebugLogViewer\Admin\Models\LogModel;
 						<label class="form-check-label">
 							<input class="form-check-input"
 								value="<?php echo esc_attr('ABSOLUTE'); ?>"
-							<?php checked($dbg_lv_selected_datetime_format, 'ABSOLUTE'); ?>
+								<?php checked($dbg_lv_selected_datetime_format, 'ABSOLUTE'); ?>
 								type="radio"
 								name="DatetimeFormatRadioOptions"
 								id="<?php echo esc_attr('DatetimeFormatRadioOptionsAbsolute'); ?>">
@@ -90,7 +90,7 @@ use DebugLogViewer\Admin\Models\LogModel;
 						<label class="form-check-label">
 							<input class="form-check-input"
 								value="<?php echo esc_attr('RELATIVE'); ?>"
-							<?php checked($dbg_lv_selected_datetime_format, 'RELATIVE'); ?>
+								<?php checked($dbg_lv_selected_datetime_format, 'RELATIVE'); ?>
 								type="radio"
 								name="DatetimeFormatRadioOptions"
 								id="<?php echo esc_attr('DatetimeFormatRadioOptionsRelative'); ?>">
@@ -98,6 +98,41 @@ use DebugLogViewer\Admin\Models\LogModel;
 							<span><?php esc_html_e('Relative', 'debug-log-viewer'); ?></span>
 						</label>
 					</div>
+				</div>
+
+				<div class="settings-group mb-4">
+					<label class="settings-group-title">
+						<?php esc_html_e('Timezone for Log Display', 'debug-log-viewer'); ?>
+						<i class="fas fa-info-circle tooltip-icon"
+							data-toggle="tooltip"
+							data-placement="right"
+						title="<?php esc_attr_e('Choose timezone for displaying log dates and times. Leave empty to use WordPress timezone.', 'debug-log-viewer'); ?>"></i>
+				</label>
+
+				<?php
+				$current_timezone = get_user_meta(get_current_user_id(), LogModel::TIMEZONE_OPTION_NAME, true);
+					$wp_timezone = wp_timezone_string();
+					$display_value = $current_timezone ?: $wp_timezone;
+					?>
+					<input type="text"
+						name="dbg_lv_timezone"
+						id="dbg_lv_timezone"
+						class="regular-text"
+						list="timezone-options"
+						value="<?php echo esc_attr($display_value); ?>"
+						placeholder="<?php esc_attr_e('Search or select timezone...', 'debug-log-viewer'); ?>">
+					<datalist id="timezone-options">
+						<option value="">
+							<?php
+							printf(
+								/* translators: %s: WordPress timezone setting */
+								esc_html__('WordPress Default (%s)', 'debug-log-viewer'),
+								esc_html($wp_timezone)
+							);
+							?>
+						</option>
+						<?php echo wp_timezone_choice($current_timezone ?: $wp_timezone); ?>
+					</datalist>
 				</div>
 			</form>
 		</div>
