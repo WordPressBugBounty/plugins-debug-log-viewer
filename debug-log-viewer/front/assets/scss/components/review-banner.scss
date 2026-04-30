@@ -64,6 +64,30 @@
 		flex-wrap: wrap;
 	}
 
+	.review-secondary-actions {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		margin-left: 4px;
+	}
+
+	.review-separator {
+		color: #dee2e6;
+		font-size: 0.75rem;
+	}
+
+	.review-text-link {
+		font-size: 0.75rem;
+		color: #adb5bd;
+		text-decoration: none;
+		transition: color 0.2s ease;
+
+		&:hover {
+			color: #6c757d;
+			text-decoration: underline;
+		}
+	}
+
 	.review-btn {
 		display: inline-flex;
 		align-items: center;
@@ -183,8 +207,3 @@
 	}
 }
 
-// Integration with WordPress admin
-.wrap .dbg-lv-review-banner {
-	margin-top: 12px;
-	margin-bottom: 12px;
-}

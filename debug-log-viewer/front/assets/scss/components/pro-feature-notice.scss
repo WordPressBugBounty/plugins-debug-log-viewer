@@ -1,4 +1,4 @@
-@import "../constants.scss";
+@use "../constants" as *;
 
 // Pro Feature Notice Component
 // Used in Cleanup and Alerts pages to show upgrade notice for free users

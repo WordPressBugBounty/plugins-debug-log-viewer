@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 use DebugLogViewer\Admin\Traits\ScheduleTrait;
 use DebugLogViewer\Admin\Models\LogModel;
 use DebugLogViewer\Admin\Helpers\Utils;
+use DebugLogViewer\Admin\Services\LogCleanupService;
 
 require_once realpath(__DIR__) . '/../../vendor/autoload.php';
 require_once realpath(__DIR__) . '/BaseController.php';
@@ -29,10 +30,10 @@ class LogController extends BaseController {
 	private $logModel;
 	private $notificationController;
 
-	public function __construct() {
+	public function __construct( ?LogModel $logModel = null, ?AlertController $notificationController = null ) {
 
-		$this->logModel               = new LogModel();
-		$this->notificationController = new AlertController();
+		$this->logModel               = $logModel ?? new LogModel();
+		$this->notificationController = $notificationController ?? new AlertController();
 		try {
 			$this->configEditor = new \WPConfigTransformer($this->logModel->getWpConfigPath());
 		} catch (\Exception $error) {
@@ -42,13 +43,7 @@ class LogController extends BaseController {
 	}
 
 	public static function isCustomLoggingPath() {
-		return defined('WP_DEBUG_LOG') && is_string(WP_DEBUG_LOG) && !in_array(WP_DEBUG_LOG, [ '1', '0', 'true', 'false' ], true) && !empty(WP_DEBUG_LOG);
-	}
-
-	public function getLogFilePath() {
-		return self::isCustomLoggingPath()
-			? WP_DEBUG_LOG
-			: WP_CONTENT_DIR . '/debug.log';
+		return LogModel::isCustomLoggingPath();
 	}
 
 	public function firstRunEnableLogging() {
@@ -57,7 +52,7 @@ class LogController extends BaseController {
 
 		try {
 
-			$path = $this->getLogFilePath();
+			$path = $this->logModel->getLogFilePath();
 			$this->configEditor->update('constant', 'WP_DEBUG', '1');
 
 			if (!self::isCustomLoggingPath()) {
@@ -80,7 +75,7 @@ class LogController extends BaseController {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->verifyAjaxRequest();
 
-		$state = $this->dbg_lv_prepare_state();
+		$state = $this->prepareState();
 
 		try {
 			$this->configEditor->update('constant', 'WP_DEBUG', $state);
@@ -97,7 +92,7 @@ class LogController extends BaseController {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->verifyAjaxRequest();
 
-		$state = $this->dbg_lv_prepare_state();
+		$state = $this->prepareState();
 
 		try {
 			$this->configEditor->update('constant', 'SCRIPT_DEBUG', $state);
@@ -114,7 +109,7 @@ class LogController extends BaseController {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->verifyAjaxRequest();
 
-		$state = $this->dbg_lv_prepare_state();
+		$state = $this->prepareState();
 
 		try {
 			if ($state == '1') {
@@ -135,7 +130,7 @@ class LogController extends BaseController {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->verifyAjaxRequest();
 
-		$state = $this->dbg_lv_prepare_state();
+		$state = $this->prepareState();
 
 		try {
 			if ($state == '1') {
@@ -157,7 +152,7 @@ class LogController extends BaseController {
 		$this->verifyAjaxRequest();
 
 		try {
-			$path = $this->getLogFilePath();
+			$path = $this->logModel->getLogFilePath();
 
 			if (is_file($path) && file_exists($path)) {
 
@@ -183,7 +178,7 @@ class LogController extends BaseController {
 		$this->verifyAjaxRequest();
 
 		try {
-			$path = $this->getLogFilePath();
+			$path = $this->logModel->getLogFilePath();
 
 			if (is_file($path) && file_exists($path)) {
 
@@ -223,7 +218,7 @@ class LogController extends BaseController {
 		}
 	}
 
-	public function dbg_lv_prepare_state() {
+	public function prepareState() {
 		if (!isset($_POST['state'])) {
 			throw new \Exception('Empty state passed');
 		}
@@ -276,7 +271,7 @@ class LogController extends BaseController {
 			$line = LogModel::getLine($row);
 			$file = LogModel::getFile($row);
 			$text = LogModel::getDescription($row);
-			$hash = md5($line . '::' . $file . '::' . $text);
+			$hash = LogModel::buildEntryHash($type, $text, $file, $line);
 
 			if (array_key_exists($hash, $errors[ $type ])) {
 				$errors[ $type ][ $hash ]['hits'] += 1;
@@ -379,12 +374,26 @@ class LogController extends BaseController {
 		wp_send_json_success(__('Timezone updated', 'debug-log-viewer'));
 	}
 
+	public function changeGroupEntries() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->verifyAjaxRequest();
+
+		$value = isset($_POST['value']) ? sanitize_text_field(wp_unslash($_POST['value'])) : null;
+
+		if (!in_array($value, [ '0', '1' ], true)) {
+			wp_send_json_error(__('Invalid value', 'debug-log-viewer'), 400);
+		}
+
+		update_user_meta(get_current_user_id(), LogModel::GROUP_ENTRIES_OPTION_NAME, $value);
+		wp_send_json_success(__('Setting updated', 'debug-log-viewer'));
+	}
+
 	public function isDebugLogPubliclyAccessible() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->verifyAjaxRequest();
 
 		try {
-			$path = $this->getLogFilePath();
+			$path = $this->logModel->getLogFilePath();
 
 		// If file doesn't exist, it's not accessible
 		if (!file_exists($path)) {
@@ -440,7 +449,7 @@ class LogController extends BaseController {
 	}
 
 	public function getLogFileWarnings() {
-		$path = $this->getLogFilePath();
+		$path = $this->logModel->getLogFilePath();
 
 		// Get file information and check for warnings
 		$file_exists = file_exists($path);
@@ -490,7 +499,7 @@ class LogController extends BaseController {
 	 * @return array Data for wp_localize_script
 	 */
 	public function getPopoverData() {
-		$path = $this->getLogFilePath();
+		$path = $this->logModel->getLogFilePath();
 		$file_exists = file_exists($path);
 
 		$fileInfo = [];
@@ -515,5 +524,54 @@ class LogController extends BaseController {
 			'fileInfo' => $fileInfo,
 			'warnings' => $warnings
 		];
+	}
+
+	/**
+	 * Save cleanup settings
+	 */
+	public function saveCleanupSettings() {
+		// Verify nonce
+		$nonce = isset($_POST['_wpnonce']) ? sanitize_text_field(wp_unslash($_POST['_wpnonce'])) : '';
+		if (!wp_verify_nonce($nonce, 'dbg_lv_save_cleanup_settings')) {
+			wp_send_json_error(array('message' => __('Security check failed', 'debug-log-viewer')), 403);
+		}
+
+		// Check user capabilities
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(array('message' => __('You do not have permission to perform this action', 'debug-log-viewer')), 403);
+		}
+
+		// Collect settings
+		$settings = array(
+			'cleanup_enabled'      => isset($_POST['cleanup_enabled']) && $_POST['cleanup_enabled'] == '1',
+			'max_log_size'         => isset($_POST['max_log_size']) ? absint($_POST['max_log_size']) : 50,
+			'cleanup_method'       => isset($_POST['cleanup_method']) ? sanitize_text_field(wp_unslash($_POST['cleanup_method'])) : 'keep_last',
+			'retention_percentage' => isset($_POST['retention_percentage']) ? absint($_POST['retention_percentage']) : 10,
+			'email_notifications'  => isset($_POST['email_notifications']) && $_POST['email_notifications'] == '1',
+		);
+
+		$validated = LogCleanupService::validate_settings($settings);
+
+		// Save to database
+		update_option(LogCleanupService::OPTION_CLEANUP_ENABLED, $validated['cleanup_enabled']);
+		update_option(LogCleanupService::OPTION_MAX_LOG_SIZE, $validated['max_log_size']);
+		update_option(LogCleanupService::OPTION_CLEANUP_METHOD, $validated['cleanup_method']);
+		update_option('dlv_cleanup_notifications_enabled', $validated['email_notifications'] ?? false);
+		update_option(LogCleanupService::OPTION_RETENTION_PERCENT, $validated['retention_percentage']);
+
+		// Handle cron scheduling
+		$cleanup_controller = new CleanupController();
+
+		if ($validated['cleanup_enabled']) {
+			$schedule = isset($_POST['cleanup_schedule']) ? sanitize_text_field(wp_unslash($_POST['cleanup_schedule'])) : 'daily';
+			$cleanup_controller->schedule_cleanup($schedule);
+		} else {
+			$cleanup_controller->unschedule_cleanup();
+		}
+
+		wp_send_json_success(array(
+			'message' => __('Auto-Cleanup settings saved successfully.', 'debug-log-viewer'),
+			'settings' => $validated,
+		));
 	}
 }

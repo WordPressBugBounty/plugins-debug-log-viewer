@@ -8,6 +8,7 @@ if (!defined('ABSPATH')) {
 
 
 use function DebugLogViewer\Admin\Controllers\dbg_lv;
+use DebugLogViewer\Admin\Controllers\ReviewController;
 
 class LogView
 {
@@ -37,14 +38,14 @@ class LogView
 		</script>
 
 		<header class="app-header">
-			<div class="container">
+			<div class="container-fluid">
 				<div class="header-wrapper">
 					<div class=" header-left">
 						<div class="header-icons tab-buttons">
 							<button class="tab-button <?php echo $current_tab === 'log-view' ? 'active' : ''; ?>"
 								id="log-view-tab-btn"
 								type="button">
-								<i class="fa-solid fa-file-lines"></i>
+								<i class="fa-solid fa-list-ul"></i>
 								<span><?php esc_html_e('Log View', 'debug-log-viewer'); ?></span>
 							</button>
 							<button class="tab-button <?php echo $current_tab === 'settings' ? 'active' : ''; ?>"
@@ -87,6 +88,13 @@ class LogView
 				</div>
 			</div>
 		</header>
+
+		<?php
+		$dbg_lv_review_controller = new ReviewController();
+		if ($dbg_lv_review_controller->isTimeToAskReview()) {
+			$dbg_lv_review_controller->renderBanner();
+		}
+		?>
 
 		<?php include_once realpath(__DIR__) . '/log-view.tpl.php'; ?>
 		<?php include_once realpath(__DIR__) . '/alerts.tpl.php'; ?>

@@ -18,10 +18,15 @@ class ReviewController {
 			return false;
 		}
 
+		// User permanently dismissed
+		if (get_user_meta($user_id, 'dbg_lv_review_dismissed_forever', true)) {
+			return false;
+		}
+
 		$review_time = get_user_meta($user_id, 'dbg_lv_next_schedule_review_notice_time', true);
-		// If review time is not set yet, set it to 2 weeks from now
+		// If review time is not set yet, set it to 1 week from now
 		if (empty($review_time)) {
-			$review_time = time() + Constants::TWO_WEEK_IN_SECONDS;
+			$review_time = time() + Constants::WEEK_IN_SECONDS;
 			add_user_meta($user_id, 'dbg_lv_next_schedule_review_notice_time', $review_time, true);
 			return false;
 		}
@@ -29,18 +34,7 @@ class ReviewController {
 		return time() > (int) $review_time;
 	}
 
-	public function isPluginPage() {
-		// Check if the 'page' parameter is set and sanitize it
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
-		return strpos($page, 'debug-log-viewer') !== false;
-	}
-
 	public function renderBanner() {
-		if (!$this->isPluginPage()) {
-			return;
-		}
-
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$url             = add_query_arg($_GET, admin_url('admin.php'));
 		$nonce_url_do    = wp_nonce_url(
@@ -50,6 +44,11 @@ class ReviewController {
 		);
 		$nonce_url_later = wp_nonce_url(
 			add_query_arg('dbg_lv_review', 'later', $url),
+			'dbg_lv_review_action',
+			'dbg_lv_nonce'
+		);
+		$nonce_url_never = wp_nonce_url(
+			add_query_arg('dbg_lv_review', 'never', $url),
 			'dbg_lv_review_action',
 			'dbg_lv_nonce'
 		);
@@ -90,6 +89,13 @@ class ReviewController {
 
 			// Redirect to WordPress.org reviews
 			wp_redirect('https://wordpress.org/support/plugin/debug-log-viewer/reviews/#new-post?filter=5');
+			exit;
+		} elseif ($review === 'never') {
+			// Permanently suppress the banner for this user
+			update_user_meta($user_id, 'dbg_lv_review_dismissed_forever', '1');
+
+			$redirect_url = remove_query_arg([ 'dbg_lv_review', 'dbg_lv_nonce' ], $this->getCurrentPageUrl());
+			wp_safe_redirect($redirect_url);
 			exit;
 		}
 	}

@@ -1,6 +1,6 @@
 /* global $, MutationObserver */
 import { t, updateFilterCount } from '../../utils.js'
-import { renderLogTypeBadge, renderDescription, convertToTimestamp, renderDatetime } from './renderers.js'
+import { renderLogTypeBadge, renderDescription, convertToTimestamp, renderDatetime, renderCount } from './renderers.js'
 import { createDropdownMenuItems, isPremium } from './ui-utils.js'
 
 /**
@@ -16,7 +16,7 @@ export function createDataTableConfig(initCallbacks) {
     order: [[0, 'desc']], // Sort by timestamp desc by default
     processing: true,
     language: {
-      processing: `<div class="loader-overlay"></div><i class="fa fa-spinner fa-spin fa-3x fa-fw"></i><span class="mt-3">${t('loading_in_process')}</span>`,
+      processing: `<div class="dlv-spinner-wrap"><span class="dlv-spinner"></span><span class="dlv-spinner-label">${t('loading_in_process')}</span></div>`,
       search: '_INPUT_',
       lengthMenu: '_MENU_',
       emptyTable: t('empty_log_table'),
@@ -74,7 +74,7 @@ export function createDataTableConfig(initCallbacks) {
               <span class="filter-text">${t('filter')}</span>
               <span class="filter-counter"></span>
             </button>
-          </div>`)
+          </div>`),
       ],
       top8End: [
         {
@@ -97,6 +97,7 @@ export function createDataTableConfig(initCallbacks) {
     columns: [
       {
         data: 'timestamp',
+        title: t('timestamp') || 'Timestamp',
         visible: false,
         render: function (data, type, row) {
           // If timestamp is missing, calculate it from datetime
@@ -105,14 +106,35 @@ export function createDataTableConfig(initCallbacks) {
       },
       {
         data: 'type',
+        title: t('type') || 'Type',
+        orderable: false,
         render: renderLogTypeBadge
       },
-      { data: 'datetime', className: 'datetime', width: '10%', render: renderDatetime },
-      { data: 'description', className: 'description ph-no-capture', render: renderDescription, width: '55%' },
-      { data: 'file', className: 'file ph-no-capture', width: '25%' },
-      { data: 'line', className: 'line' }
+      {
+        data: 'datetime',
+        title: t('last_seen') || 'Last seen',
+        className: 'datetime',
+        width: '10%',
+        render: renderDatetime
+      },
+      {
+        data: 'count',
+        title: t('count') || 'Count',
+        className: 'count-col',
+        width: '5%',
+        render: renderCount
+      },
+      { data: 'description', title: t('description') || 'Description', className: 'description ph-no-capture', orderable: false, render: renderDescription, width: '50%' },
+      { data: 'file', title: t('file') || 'File', className: 'file ph-no-capture', orderable: false, width: '25%' },
+      { data: 'line', title: t('line') || 'Line', className: 'line', orderable: false, width: '15%' }
     ],
     autoWidth: false,
+    stateSaveParams: function (settings, data) {
+      // Don't persist Count column (index 3) visibility — it's controlled by the grouping setting
+      if (data.columns && data.columns[3]) {
+        delete data.columns[3].visible
+      }
+    },
     initComplete: function () {
       if (initCallbacks && typeof initCallbacks.onInitComplete === 'function') {
         initCallbacks.onInitComplete()

@@ -6,7 +6,6 @@ if (! defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
-use DebugLogViewer\Admin\Controllers\LogController;
 use DebugLogViewer\Admin\Models\LogModel;
 use function DebugLogViewer\Admin\Controllers\dbg_lv;
 
@@ -63,9 +62,8 @@ class LogCleanupService
 	 */
 	public function __construct()
 	{
-		$log_controller      = new LogController();
-		$this->logFilePath = $log_controller->getLogFilePath();
 		$this->logModel = new LogModel();
+		$this->logFilePath = $this->logModel->getLogFilePath();
 
 		// Get max log size from options (in MB), convert to bytes
 		$max_size_mb         = get_option(self::OPTION_MAX_LOG_SIZE, 50);

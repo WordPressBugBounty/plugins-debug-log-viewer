@@ -6,8 +6,6 @@ if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
-use DebugLogViewer\Admin\Controllers\LogController;
-use DebugLogViewer\Admin\Controllers\AlertController;
 use DebugLogViewer\Admin\Helpers\Utils;
 
 trait ScheduleTrait {
@@ -71,7 +69,7 @@ trait ScheduleTrait {
 		delete_option($event);
 	}
 
-	public function dbg_lv_change_notifications_status() {
+	public function changeNotificationsStatus() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->verifyAjaxRequest();
 
@@ -101,7 +99,7 @@ trait ScheduleTrait {
 				wp_send_json_error(__('At least one error level must be selected', 'debug-log-viewer'));
 			}
 
-			$notificator = new AlertController();
+			$notificator = $this->notificationController;
 			// Validate field recurrence only if alerts are turn on
 			if ($status == 'enable' && ( !isset($recurrence) || !array_key_exists($recurrence, $notificator->emailRecurrences) )) {
 				wp_send_json_error(__('An invalid value received', 'debug-log-viewer'));
@@ -119,12 +117,12 @@ trait ScheduleTrait {
 			switch ($status) {
 				case 'enable':
 					if ($send_test_email === true) {
-						$notificator->dbg_lv_send_test_email($options);
+						$notificator->sendTestEmailToRecipients($options);
 					}
-					( new LogController() )->addWpScheduleEvent($event, $options);
+					$this->addWpScheduleEvent($event, $options);
 					break;
 				case 'disable':
-					( new LogController() )->deleteWpScheduleEvent($event);
+					$this->deleteWpScheduleEvent($event);
 					break;
 			}
 			wp_send_json_success();

@@ -1,4 +1,5 @@
-/* global localStorage, dbg_lv_backend_data */
+/* global localStorage */
+import { removePublicAccessWarning } from '../log-popover-renderer.js'
 
 /**
  * Handles the alert dismissal functionality
@@ -18,7 +19,7 @@ export class AlertHandler {
     $(document).off('click', this.dismissSelector).on('click', this.dismissSelector, function (e) {
       e.preventDefault()
       this.dismissForWeek()
-      this.removePublicLogAlert()
+      removePublicAccessWarning()
     }.bind(this))
   }
 
@@ -28,16 +29,6 @@ export class AlertHandler {
   dismissForWeek () {
     // Store current timestamp in localStorage
     localStorage.setItem(this.dismissKey, new Date().getTime().toString())
-  }
-
-  removePublicLogAlert () {
-    dbg_lv_backend_data.log_popover_data.warnings = dbg_lv_backend_data.log_popover_data.warnings.filter(warning => {
-      return warning.key !== 'dbg_lv_public_log_alert_dismissed'
-    })
-
-    if (window.LogPopoverRenderer) {
-      window.LogPopoverRenderer.refresh(dbg_lv_backend_data.log_popover_data)
-    }
   }
 
   /**

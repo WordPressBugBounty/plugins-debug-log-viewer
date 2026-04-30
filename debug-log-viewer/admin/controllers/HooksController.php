@@ -47,7 +47,7 @@ class HooksController
 		// Include styles and scripts in Debug Log Viewer plugin's pages only
 		add_action('admin_enqueue_scripts', function ($hook_suffix) {
 			// Use $this instead of $this->hooksController
-			$this->dbg_lv_admin_assets_enqueue($hook_suffix);
+			$this->enqueueAdminAssets($hook_suffix);
 		});
 
 		// Log actions
@@ -61,7 +61,7 @@ class HooksController
 
 		// Handle Alerts
 		add_action('wp_ajax_dbg_lv_change_log_viewer_alerts_status', function () {
-			$this->logController->dbg_lv_change_notifications_status();
+			$this->logController->changeNotificationsStatus();
 		});
 
 		add_action('wp_ajax_dbg_lv_get_current_user_email', function () {
@@ -81,6 +81,11 @@ class HooksController
 		// Timezone selection
 		add_action('wp_ajax_dbg_lv_change_timezone', function () {
 			$this->logController->changeTimezone();
+		});
+
+		// Group entries toggle
+		add_action('wp_ajax_dbg_lv_change_group_entries', function () {
+			$this->logController->changeGroupEntries();
 		});
 		
 		// Save cleanup settings
@@ -117,7 +122,7 @@ class HooksController
 		});
 
 		add_action(LogController::SCHEDULE_MAIL_SEND, function ($args) {
-			$this->notificationController->dbg_lv_send_logs_handler($args);
+			$this->notificationController->sendLogsHandler($args);
 		});
 
 		add_action('wp_ajax_dbg_lv_get_alert_schedule', function () {
@@ -129,11 +134,6 @@ class HooksController
 		});
 
 		add_action('admin_init', function () {
-			if ($this->reviewController->isTimeToAskReview()) {
-				add_action('admin_notices', function () {
-					$this->reviewController->renderBanner();
-				});
-			}
 			$this->reviewController->handleUserAction();
 		});
 
@@ -143,7 +143,7 @@ class HooksController
 		register_uninstall_hook($dbg_lv_index_file, ['DebugLogViewer\Admin\Controllers\ServiceController', 'uninstallHandler']);
 	}
 
-	public function dbg_lv_admin_assets_enqueue($hook_suffix)
+	public function enqueueAdminAssets($hook_suffix)
 	{
 		if (strpos($hook_suffix, 'debug-log-viewer') !== false) {
 			// Get the plugin version from the main plugin file
@@ -151,7 +151,7 @@ class HooksController
 			$plugin_data      = get_file_data($main_plugin_file, ['Version' => 'Version']);
 			$version          = !empty($plugin_data['Version']) ? $plugin_data['Version'] : '1.0.0';
 
-			$logController = new LogController();
+			$logController = $this->logController;
 
 			// Enqueue Freemius checkout script
 			wp_enqueue_script('freemius_checkout', 'https://checkout.freemius.com/js/v1/', [], $version, true);
@@ -173,13 +173,14 @@ class HooksController
 			}
 
 			// Localize script
+			$group_entries_meta = get_user_meta(get_current_user_id(), LogModel::GROUP_ENTRIES_OPTION_NAME, true);
 			wp_localize_script('dbg_lv_app_js', 'dbg_lv_backend_data', [
 				'ajax_nonce'           => wp_create_nonce('ajax_nonce'),
 				'phrases'              => Phrases::getParsedContentPhrases(),
 				'log_updates_mode'     => get_option(LogModel::LOG_UPDATES_MODE_OPTION_NAME),
 				'datetime_format'      => get_option(LogModel::DATETIME_FORMAT_OPTION_NAME),
+				'group_entries'        => $group_entries_meta !== '' ? $group_entries_meta : '1',
 				'log_updates_interval' => LogModel::LOG_UPDATES_INTERVAL,
-				'log_popover_data'     => $logController->getPopoverData(),
 				'is_premium'           => $is_premium,
 				'checkout_url'         => $checkout_url
 			]);

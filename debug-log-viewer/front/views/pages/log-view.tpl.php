@@ -6,10 +6,10 @@ if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
-use DebugLogViewer\Admin\Controllers\LogController;
+use DebugLogViewer\Admin\Models\LogModel;
 
-$dbg_lv_log_controller = new LogController();
-$dbg_lv_path           = $dbg_lv_log_controller->getLogFilePath();
+$dbg_lv_log_model = new LogModel();
+$dbg_lv_path      = $dbg_lv_log_model->getLogFilePath();
 ?>
 <!-- Log View Tab Content -->
 <div class="tab-pane fade <?php echo (!isset($_GET['tab']) || $_GET['tab'] === 'log-view') ? 'show active' : ''; ?>"
@@ -17,7 +17,7 @@ $dbg_lv_path           = $dbg_lv_log_controller->getLogFilePath();
 	role="tabpanel"
 	aria-labelledby="log-view-tab">
 
-	<div class="container dbg_lv-log-viewer">
+	<div class="container-fluid dbg_lv-log-viewer">
 		<div class="main-table content-wrapper">
 
 			<?php

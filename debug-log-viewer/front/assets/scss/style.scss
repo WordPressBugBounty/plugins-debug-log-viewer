@@ -1,21 +1,20 @@
-@import "./constants.scss";
+@use "./constants" as *;
 
+@use "./pages/log-viewer";
+@use "./pages/alerts";
+@use "./pages/settings";
+@use "./pages/cleanup";
 
-@import "./pages/log-viewer.scss";
-@import "./pages/alerts.scss";
-@import "./pages/settings.scss";
-@import "./pages/cleanup.scss";
+@use "./components/scroll-to-top";
+@use "./components/plan-badge";
+@use "./components/next-schedule-info";
 
-@import "./components/scroll-to-top.scss";
-@import "./components/plan-badge.scss";
-@import "./components/next-schedule-info.scss";
-
-@import "./components/log-info-popover.scss";
-@import "./components/review-banner.scss";
-@import "./components/quick-features-modal.scss";  
+@use "./components/log-info-popover";
+@use "./components/review-banner";
+@use "./components/quick-features-modal";
 
 #wpbody-content {
-    background-color: #f9f9fe;
+    background-color: $body-color;
     font-size: 14px;
     min-height: 100vh;
 
@@ -40,7 +39,7 @@
 
     .freemius-checkout-trigger {
         cursor: pointer;
-        
+
         &:hover {
             opacity: 0.9;
         }
@@ -50,8 +49,18 @@
         padding-left: 13px;
         padding-right: 13px;
 
+        > div:first-child {
+            background-color: $main-background-table-color;
+            margin-left: 0px;
+            margin-right: 5px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-radius: 5px;
+            box-shadow: $block-box-shadow;
+        }
+
         .dt-layout-table {
-            background-color: #fff;
+            background-color: $main-background-table-color;
             padding: 0 0 25px 0;
             margin: 0 -25px;
             position: relative;
@@ -74,12 +83,13 @@
     .buttons-colvis {
         color: #333;
         border-color: $border-color;
-        font-size: 13px;
+        font-size: 14px;
         height: 30px;
         background: #fff;
         margin-left: 5px;
         padding-top: 4px;
         border-radius: 5px;
+        background-color: $block-bg-color;
     }
 
     .dt-length {
@@ -91,8 +101,9 @@
         select {
             border-color: $border-color;
             border-radius: 5px;
+            background-color: $block-bg-color;
+            margin-right: 0;
         }
-
     }
 
     .time-filter {
@@ -103,13 +114,18 @@
 
         .datetime-range-buttons {
             height: 30px;
+            .btn {
+                min-width: 40px;
+            }
 
             .btn:not(.active) {
-                background-color: #fff;
+                background-color: $block-bg-color;
                 border: none;
+                color: $main-font-color;
 
                 &:hover {
                     background-color: var(--bs-btn-active-bg);
+                    color: $main-background-table-color;
                 }
             }
 
@@ -132,19 +148,19 @@
 
     .advanced-filter {
         .btn {
-            background-color: #fff;
+            background-color: $block-bg-color;
 
             &:hover {
                 background-color: var(--bs-btn-active-bg);
-                
+
                 .filter-text {
-                    color: #fff;
+                    color: $main-background-table-color;
                 }
             }
         }
 
         .filter-text {
-            color: #555;
+            color: $main-font-color;
             transition: color 0.2s ease;
         }
 
@@ -169,7 +185,7 @@
                 border-radius: 5px 5px 0 0;
                 cursor: pointer;
                 font-weight: 400;
-                transition: all .2s ease;
+                transition: all 0.2s ease;
                 font-size: 14px;
                 margin-right: 4px;
                 padding-left: 12px;

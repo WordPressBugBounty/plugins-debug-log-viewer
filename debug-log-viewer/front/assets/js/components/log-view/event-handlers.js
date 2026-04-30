@@ -181,6 +181,20 @@ export class LogViewerEventHandlers {
       self.table.clear()
       await self.api.fillInitialData()
     })
+
+    // Group duplicates radio options (lives in Settings tab)
+    $('input[name="GroupEntriesRadioOptions"]').on('change', async function () {
+      const isGrouped = $(this).val() === '1'
+
+      await self.api.changeGroupEntries(isGrouped)
+
+      // Show/hide Count column (index 3)
+      self.table.column(3).visible(isGrouped)
+
+      // Reload table with new grouping mode
+      self.table.clear().draw()
+      await self.api.fillInitialData()
+    })
   }
 
   /**

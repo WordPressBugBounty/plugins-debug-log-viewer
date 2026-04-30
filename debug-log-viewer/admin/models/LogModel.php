@@ -6,7 +6,6 @@ if (!defined('ABSPATH')) {
 	exit; // Exit if accessed directly
 }
 
-use DebugLogViewer\Admin\Controllers\LogController;
 use DebugLogViewer\Admin\Translations\Phrases;
 use DebugLogViewer\Admin\Helpers\Utils;
 
@@ -26,6 +25,7 @@ class LogModel
 	const LOG_UPDATES_MODE_OPTION_NAME = 'dbg_lv_log_updates_mode';
 	const DATETIME_FORMAT_OPTION_NAME  = 'dbg_lv_datetime_format';
 	const TIMEZONE_OPTION_NAME         = 'dbg_lv_timezone';
+	const GROUP_ENTRIES_OPTION_NAME    = 'dbg_lv_group_entries';
 	const DATETIME_FORMAT_ABSOLUTE     = 'ABSOLUTE';
 	const DATETIME_FORMAT_RELATIVE     = 'RELATIVE';
 	const LOG_FILE_LIMIT               = 10 * 1024 * 1024; // 10 MB
@@ -36,6 +36,16 @@ class LogModel
 	const UNIT_KILOBYTES = 'kilobytes';
 	const UNIT_MEGABYTES = 'megabytes';
 	const UNIT_GIGABYTES = 'gigabytes';
+
+	public static function isCustomLoggingPath() {
+		return defined('WP_DEBUG_LOG') && is_string(WP_DEBUG_LOG) && !in_array(WP_DEBUG_LOG, [ '1', '0', 'true', 'false' ], true) && !empty(WP_DEBUG_LOG);
+	}
+
+	public function getLogFilePath() {
+		return self::isCustomLoggingPath()
+			? WP_DEBUG_LOG
+			: WP_CONTENT_DIR . '/debug.log';
+	}
 
 	public function getWpConfigPath() {
 		// Starting from the current directory
@@ -131,8 +141,7 @@ class LogModel
 	}
 
 	public function getNewEntries() {
-		$logController = new LogController();
-		$path          = $logController->getLogFilePath();
+		$path = $this->getLogFilePath();
 		// Handle missing file
 		if (!file_exists($path)) {
 			return $this->resetLog();
@@ -188,8 +197,7 @@ class LogModel
 	}
 
 	public function getParsedContent() {
-		$logController = new LogController();
-		$path          = $logController->getLogFilePath();
+		$path = $this->getLogFilePath();
 
 		if (!file_exists($path) || !is_file($path)) {
 			return false;
@@ -309,6 +317,58 @@ class LogModel
 		return null;
 	}
 
+	/**
+	 * Build a hash key from type, description, file and line.
+	 *
+	 * @param string $type        Log level / type.
+	 * @param string $description Description text.
+	 * @param string $file        Source file path.
+	 * @param string $line        Line number.
+	 * @return string MD5 hash.
+	 */
+	public static function buildEntryHash( string $type, string $description, string $file, string $line ): string {
+		return md5( $type . '::' . $description . '::' . $file . '::' . $line );
+	}
+
+	/**
+	 * Group formatted log entries by a hash of type + description + file + line.
+	 *
+	 * @param array $entries Formatted entry arrays (as returned by LiveUpdatesController::getUpdates).
+	 * @return array Grouped entries, each with additional `hash` and `count` keys.
+	 */
+	public static function groupEntries( array $entries ): array {
+		$groups = [];
+
+		foreach ($entries as $entry) {
+			if (empty($entry)) {
+				continue;
+			}
+
+			$hash = self::buildEntryHash(
+				$entry['type'] ?? '',
+				$entry['description']['text'] ?? '',
+				$entry['file'] ?? '',
+				$entry['line'] ?? ''
+			);
+
+			if (isset($groups[ $hash ])) {
+				$groups[ $hash ]['count']++;
+
+				// Keep most-recent timestamp / datetime as the representative value.
+				if ($entry['timestamp'] > $groups[ $hash ]['timestamp']) {
+					$groups[ $hash ]['timestamp'] = $entry['timestamp'];
+					$groups[ $hash ]['datetime']  = $entry['datetime'];
+				}
+			} else {
+				$entry['hash']   = $hash;
+				$entry['count']  = 1;
+				$groups[ $hash ] = $entry;
+			}
+		}
+
+		return array_values($groups);
+	}
+
 	public static function getDescription( $row ) {
 		if (self::getType($row) === self::LOG_LEVEL_DATABASE) {
 
@@ -326,8 +386,7 @@ class LogModel
 		$withUnits = isset($params['with_measure_units']) ? $params['with_measure_units'] : null;
 		$raw       = isset($params['raw']) ? $params['raw'] : null;
 
-		$logController = new LogController();
-		$path          = $logController->getLogFilePath();
+		$path = $this->getLogFilePath();
 
 		if (is_file($path) && filesize($path)) {
 			$filesizeInBytes = filesize($path);

@@ -1,8 +1,7 @@
+@use "../constants" as *;
+
 .settings {
-
-
     form {
-
         .settings-group {
             padding: 15px 25px;
             border-radius: 5px;
@@ -10,9 +9,8 @@
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
             margin-top: 1rem;
 
-
             p {
-                color: #555;
+                color: $main-font-color;
                 line-height: 1.6;
                 font-size: 14px;
             }
@@ -21,18 +19,11 @@
                 display: block;
                 margin-bottom: 1rem;
                 font-weight: 500;
-                color: #444;
+                color: $main-font-color;
             }
 
-            .settings-group {
-                margin-bottom: 1.5rem;
-
-                .settings-group-title {
-                    font-weight: 600;
-                    margin-bottom: 1rem;
-                    color: #23282d;
-                    font-size: 1rem;
-                }
+            #dbg_lv_timezone {
+                border: 1px solid #8c8f9436;
             }
 
             .form-check {
@@ -48,7 +39,7 @@
                     }
 
                     .form-check-input:checked {
-                        background-color: transparent
+                        background-color: transparent;
                     }
 
                     .form-check-sign {

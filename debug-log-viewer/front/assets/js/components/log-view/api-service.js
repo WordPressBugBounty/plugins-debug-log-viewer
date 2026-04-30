@@ -11,6 +11,7 @@ export class LogViewerApiService {
       const rawResponse = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_run_live_updates',
         initial: true,
+        group_entries: this.isGroupingEnabled(),
         wp_nonce: dbg_lv_backend_data.ajax_nonce
       })
 
@@ -32,6 +33,7 @@ export class LogViewerApiService {
 
       const rawResponse = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_run_live_updates',
+        group_entries: this.isGroupingEnabled(),
         wp_nonce: dbg_lv_backend_data.ajax_nonce
       })
 
@@ -45,11 +47,98 @@ export class LogViewerApiService {
       }
 
       if (response.data.length > 0) {
-        this.table.rows.add(response.data).draw()
+        this._mergeGroupedEntries(response.data)
       }
     } catch (error) {
       showToast(error, 'error')
     }
+  }
+
+  /**
+   * Returns whether grouping is currently enabled.
+   * Reads from dbg_lv_backend_data which is kept in sync by changeGroupEntries().
+   */
+  isGroupingEnabled () {
+    return dbg_lv_backend_data.group_entries !== '0'
+  }
+
+  /**
+   * Persist the group-entries preference via AJAX.
+   */
+  async changeGroupEntries (enabled) {
+    try {
+      const response = await jQuery.post({
+        url: ajaxurl,
+        data: {
+          action: 'dbg_lv_change_group_entries',
+          value: enabled ? '1' : '0',
+          wp_nonce: dbg_lv_backend_data.ajax_nonce
+        }
+      })
+
+      if (!response.success) {
+        throw new Error(response.data)
+      }
+
+      // Keep backend data in sync so further requests use the right value
+      dbg_lv_backend_data.group_entries = enabled ? '1' : '0'
+      showToast(t('settings_saved_successfully'), 'success')
+    } catch (error) {
+      showToast(error, 'error')
+      throw error
+    }
+  }
+
+  /**
+   * Merge incoming grouped entries into the existing table rows.
+   * Entries that share a hash with an existing row have their count incremented
+   * and their timestamp/datetime updated if the incoming entry is more recent.
+   * Entries with no matching row are added as new rows.
+   * When grouping is disabled, entries are simply appended.
+   *
+   * @param {Array} newGroups Grouped entries received from the server.
+   */
+  _mergeGroupedEntries (newGroups) {
+    if (!this.isGroupingEnabled()) {
+      this.table.rows.add(newGroups).draw()
+      return
+    }
+
+    const additions = []
+
+    newGroups.forEach((newGroup) => {
+      if (!newGroup.hash) {
+        additions.push(newGroup)
+        return
+      }
+
+      let found = false
+
+      this.table.rows().every(function () {
+        const rowData = this.data()
+        if (rowData.hash === newGroup.hash) {
+          const mergedCount = (rowData.count || 1) + (newGroup.count || 1)
+          const useNew = newGroup.timestamp > rowData.timestamp
+          this.data(Object.assign({}, rowData, {
+            count: mergedCount,
+            timestamp: useNew ? newGroup.timestamp : rowData.timestamp,
+            datetime: useNew ? newGroup.datetime : rowData.datetime
+          }))
+          found = true
+          return false // break
+        }
+      })
+
+      if (!found) {
+        additions.push(newGroup)
+      }
+    })
+
+    if (additions.length > 0) {
+      this.table.rows.add(additions)
+    }
+
+    this.table.draw()
   }
 
   async toggleDebugMode (isChecked) {

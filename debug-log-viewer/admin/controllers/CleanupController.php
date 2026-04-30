@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Cleanup Controller
  * 
@@ -146,8 +145,6 @@ class CleanupController extends BaseController
 		$this->verifyAjaxRequest();
 
 		$result = $this->cleanupService->executeCleanup();
-
-		$this->log_cleanup_result($result);
 
 		if ($result['success']) {
 			wp_send_json_success(array(

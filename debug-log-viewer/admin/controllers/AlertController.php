@@ -136,13 +136,13 @@ class AlertController {
 		$emailService->send();
 	}
 
-	public function dbg_lv_send_test_email( $options ) {
+	public function sendTestEmailToRecipients( $options ) {
 		if (isset($this->sendTestEmailHandler) && is_callable($this->sendTestEmailHandler)) {
 			call_user_func($this->sendTestEmailHandler, $options);
 		}
 	}
 
-	public function dbg_lv_send_logs_handler( $event ) {
+	public function sendLogsHandler( $event ) {
 		$options = get_option($event);
 
 		if (!$options) {

@@ -32,8 +32,6 @@ use DebugLogViewer\Admin\Models\LogModel;
 					<label class="settings-group-title">
 						<?php esc_html_e('The log update mode', 'debug-log-viewer'); ?>
 						<i class="fas fa-info-circle tooltip-icon"
-							data-toggle="tooltip"
-							data-placement="right"
 							title="<?php esc_attr_e('Choose how you want the log to update: manually or automatically in real-time', 'debug-log-viewer'); ?>"></i>
 					</label>
 
@@ -68,8 +66,6 @@ use DebugLogViewer\Admin\Models\LogModel;
 					<label class="settings-group-title">
 						<?php esc_html_e('Datetime format in logs', 'debug-log-viewer'); ?>
 						<i class="fas fa-info-circle tooltip-icon"
-							data-toggle="tooltip"
-							data-placement="right"
 							title="<?php esc_attr_e('Choose how you want the datetime to be displayed: absolute or relative time', 'debug-log-viewer'); ?>"></i>
 					</label>
 
@@ -104,13 +100,11 @@ use DebugLogViewer\Admin\Models\LogModel;
 					<label class="settings-group-title">
 						<?php esc_html_e('Timezone for Log Display', 'debug-log-viewer'); ?>
 						<i class="fas fa-info-circle tooltip-icon"
-							data-toggle="tooltip"
-							data-placement="right"
-						title="<?php esc_attr_e('Choose timezone for displaying log dates and times. Leave empty to use WordPress timezone.', 'debug-log-viewer'); ?>"></i>
-				</label>
+							title="<?php esc_attr_e('Choose timezone for displaying log dates and times. Leave empty to use WordPress timezone.', 'debug-log-viewer'); ?>"></i>
+					</label>
 
-				<?php
-				$current_timezone = get_user_meta(get_current_user_id(), LogModel::TIMEZONE_OPTION_NAME, true);
+					<?php
+					$current_timezone = get_user_meta(get_current_user_id(), LogModel::TIMEZONE_OPTION_NAME, true);
 					$wp_timezone = wp_timezone_string();
 					$display_value = $current_timezone ?: $wp_timezone;
 					?>
@@ -133,6 +127,44 @@ use DebugLogViewer\Admin\Models\LogModel;
 						</option>
 						<?php echo wp_timezone_choice($current_timezone ?: $wp_timezone); ?>
 					</datalist>
+				</div>
+
+				<div class="settings-group mb-4">
+					<label class="settings-group-title">
+						<?php esc_html_e('Group duplicates', 'debug-log-viewer'); ?>
+						<i class="fas fa-info-circle tooltip-icon"
+							title="<?php esc_attr_e('Collapse repeated log entries into a single row with an occurrence counter', 'debug-log-viewer'); ?>"></i>
+					</label>
+
+					<?php
+					$dbg_lv_group_entries = get_user_meta(get_current_user_id(), LogModel::GROUP_ENTRIES_OPTION_NAME, true);
+					$dbg_lv_group_entries = $dbg_lv_group_entries !== '' ? $dbg_lv_group_entries : '1';
+					?>
+					<div class="form-check">
+						<label class="form-check-label">
+							<input class="form-check-input"
+								value="1"
+								<?php checked($dbg_lv_group_entries, '1'); ?>
+								type="radio"
+								name="GroupEntriesRadioOptions"
+								id="GroupEntriesRadioOptionsEnabled">
+							<span class="form-check-sign"></span>
+							<span><?php esc_html_e('Enabled', 'debug-log-viewer'); ?></span>
+						</label>
+					</div>
+
+					<div class="form-check">
+						<label class="form-check-label">
+							<input class="form-check-input"
+								value="0"
+								<?php checked($dbg_lv_group_entries, '0'); ?>
+								type="radio"
+								name="GroupEntriesRadioOptions"
+								id="GroupEntriesRadioOptionsDisabled">
+							<span class="form-check-sign"></span>
+							<span><?php esc_html_e('Disabled', 'debug-log-viewer'); ?></span>
+						</label>
+					</div>
 				</div>
 			</form>
 		</div>

@@ -34,7 +34,7 @@ function refreshCleanupStats() {
 
           // Update size display
           $('.progress').prev('.d-flex').find('span').last()
-            .text(Number(stats.current_size_mb).toFixed(2) + ' / ' + Number(stats.max_size_mb).toFixed(0) + ' MB')
+            .text(stats.current_size_mb.toFixed(2) + ' / ' + stats.max_size_mb.toFixed(0) + ' MB')
         }
 
         // Update history table

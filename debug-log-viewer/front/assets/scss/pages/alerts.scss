@@ -1,5 +1,5 @@
-@import "../constants.scss";
-@import "../components/pro-feature-notice.scss";
+@use "../constants" as *;
+@use "../components/pro-feature-notice";
 
 .alerts {
     padding: 25px;
@@ -9,7 +9,7 @@
     margin-top: 1rem;
 
     p {
-        color: #555;
+        color: $main-font-color;
         line-height: 1.6;
         font-size: 14px;
         margin-bottom: 0;
@@ -94,6 +94,10 @@
 
         select[name="recurrence"] {
             max-width: 388px;
+            border-color: #8c8f9436;
+            &:hover {
+                color: #000;
+            }
         }
 
         .error-levels-container {

@@ -63,6 +63,20 @@ export function renderDatetime (data, type, row) {
   return convertToTimestamp(data)
 }
 
+/**
+ * Renders the occurrence count for grouped entries.
+ */
+export function renderCount (data, type) {
+  const count = data || 1
+  if (type !== 'display') {
+    return count
+  }
+  if (count <= 1) {
+    return `<span class="dlv-count-badge dlv-count-single">${count}</span>`
+  }
+  return `<span class="dlv-count-badge dlv-count-multiple">${count}</span>`
+}
+
 function formatRelativeTime (datetimeString) {
   const logDate = new Date(datetimeString)
   const now = new Date()
@@ -217,12 +231,17 @@ $(document).ready(function ($) {
     const $target = $($(this).data('target'))
 
     if ($target.is(':visible')) {
-      $target.slideUp(300)
+
+      
+      $target.slideUp(300, () => {
+        $(this).toggleClass('active')
+      });
       $(this).html(`
         <i class="fa-solid fa-code"></i>
         ${t('stack_trace')}`)
     } else {
-      $target.slideDown(300)
+      $target.slideDown(300);
+      $(this).toggleClass('active')
       $(this).html(t('hide_stack_trace'))
     }
   })

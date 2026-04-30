@@ -7,7 +7,7 @@ import { LogViewerEventHandlers } from './event-handlers.js'
 import { initEmailNotificationsForm } from './notification-utils.js'
 import { initHelpScoutBeacon } from '../help-scout.js'
 import { AlertHandler } from './alert-handler.js'
-import { LogPopoverRenderer } from '../log-popover-renderer.js'
+import { initLogPanels, appendPublicAccessWarning } from '../log-popover-renderer.js'
 
 (async ($) => {
   initHelpScoutBeacon('055b8c26-4e0e-4352-a0f2-7e6f3e7c3336')
@@ -21,6 +21,10 @@ import { LogPopoverRenderer } from '../log-popover-renderer.js'
 
   const dataTableConfig = createDataTableConfig()
   const table = $('#dbg_lv_log-table').DataTable(dataTableConfig)
+
+  // Sync Count column visibility with the saved group_entries preference
+  const isGroupingOnInit = dbg_lv_backend_data.group_entries !== '0'
+  table.column(3).visible(isGroupingOnInit)
 
   $('.right-subheader .search-input').on('input', function () {
     const searchValue = $(this).val().trim()
@@ -41,14 +45,9 @@ import { LogPopoverRenderer } from '../log-popover-renderer.js'
   alertHandler.init()
   await apiService.fillInitialData()
 
-  // Make LogPopoverRenderer available globally first
-  window.LogPopoverRenderer = LogPopoverRenderer
-
-  // Initialize LogPopoverRenderer container
-  const popoverContainer = document.querySelector('.log-path-icons')
-  if (popoverContainer) {
-    window.LogPopoverRenderer.setContainer(popoverContainer)
-    window.LogPopoverRenderer.refresh(dbg_lv_backend_data.log_popover_data)
+  const $logPathIcons = $('.log-path-icons')
+  if ($logPathIcons.length) {
+    initLogPanels($logPathIcons)
   }
 
   $('#dbg_lv_log-table_processing').remove()
@@ -59,8 +58,9 @@ import { LogPopoverRenderer } from '../log-popover-renderer.js'
 
     if (result.success && result.data.is_public) {
       if (result.data.info) {
-        dbg_lv_backend_data.log_popover_data.warnings.push(result.data.info)
-        window.LogPopoverRenderer.refresh(dbg_lv_backend_data.log_popover_data)
+        if ($logPathIcons.length){
+          appendPublicAccessWarning($logPathIcons, result.data.info)
+        }
       }
     }
   }

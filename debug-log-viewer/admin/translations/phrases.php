@@ -121,7 +121,21 @@ class Phrases {
 				'running'                      => __('Running...', 'debug-log-viewer'),
 				'cleanup_completed'            => __('Cleanup completed successfully!', 'debug-log-viewer'),
 				'cleanup_failed'               => __('Cleanup failed.', 'debug-log-viewer'),
-				'error_during_cleanup'         => __('An error occurred during cleanup.', 'debug-log-viewer')
+				'error_during_cleanup'         => __('An error occurred during cleanup.', 'debug-log-viewer'),
+
+				// Grouping phrases
+				'group_duplicates'             => __('Group duplicates', 'debug-log-viewer'),
+				'last_seen'                    => __('Last seen', 'debug-log-viewer'),
+				'count'                        => __('Count', 'debug-log-viewer'),
+
+				// Column header phrases
+				'timestamp'                    => __('Timestamp', 'debug-log-viewer'),
+				'type'                         => __('Type', 'debug-log-viewer'),
+				'description'                  => __('Description', 'debug-log-viewer'),
+				'file'                         => __('File', 'debug-log-viewer'),
+				'line'                         => __('Line', 'debug-log-viewer'),
+
+				'remind_in_a_week'			   => __('Remind in a week', 'debug-log-viewer')
 			];
 		}
 	}

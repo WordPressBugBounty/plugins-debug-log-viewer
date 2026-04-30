@@ -1,13 +1,16 @@
+@use "../constants" as *;
+
 .log-info-trigger {
     cursor: pointer;
-    color: #0dcaf0;
     transition: color 0.2s ease;
-    margin-right: 8px;
 
     &:hover {
         color: #0aa2c0;
     }
 
+    &.active {
+        color: #0a58ca;
+    }
 }
 
 .log-warning-trigger {
@@ -21,6 +24,10 @@
         &:hover {
             color: #c82333;
         }
+
+        &.active {
+            color: #a71d2a;
+        }
     }
 
     &.severity-warning {
@@ -29,32 +36,43 @@
         &:hover {
             color: #e8681a;
         }
+
+        &.active {
+            color: #d45d12;
+        }
     }
 }
 
 .log-path-icons {
     display: flex;
     align-items: center;
-    gap: 8px;
+    position: relative;
+    top: 5px;
+
+    .active{
+        background-color: $main-background-table-color;
+    }
 }
 
-.popover {
-    .popover-header {
-        font-size: 14px;
+.log-path-collapse-panels {
+    .log-panel {
+        background-color: $main-background-table-color;
+        border: 1px solid #e0e4f0;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+        overflow: hidden;
     }
-    .popover-body {
-        user-select: text;
 
-        #dbg_lv_dismiss_alert {
-            position: absolute;
-            right: 0;
-            width: 30px;
+    .log-panel-content {
+        padding: 15px 25px;
+
+        .log-panel-header {
+            font-weight: 600;
+            color: #444;
         }
 
-        span {
-            cursor: text;
-            line-height: 1.4;
-            word-break: break-word;
+        .mb-2:last-child {
+            margin-bottom: 0 !important;
         }
     }
 }

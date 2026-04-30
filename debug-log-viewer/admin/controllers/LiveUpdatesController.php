@@ -19,35 +19,41 @@ class LiveUpdatesController extends BaseController {
 	public const DEBUG_LOG_LAST_FILESIZE = 'dbg_lv_dbg_log_last_filesize';
 	public const LOG_UPDATES_INTERVAL    = 10; // seconds
 
+	private $logModel;
+
+	public function __construct( ?LogModel $logModel = null ) {
+		$this->logModel = $logModel ?? new LogModel();
+	}
+
 	public function run() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing
 		$this->verifyAjaxRequest();
 
-		$logModel = new LogModel();
-
 		if (isset($_POST['initial']) && $_POST['initial'] === 'true') {
-			update_option(LogModel::LAST_POSITION_OPTION_NAME, $logModel->getInitialLogPosition());
+			update_option(LogModel::LAST_POSITION_OPTION_NAME, $this->logModel->getInitialLogPosition());
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$group_entries = isset($_POST['group_entries']) && $_POST['group_entries'] === 'true';
+
 		$this->clearDebugLogFileStat();
-		$updates = $logModel->getNewEntries();
+		$updates = $this->logModel->getNewEntries();
 
 		if (isset($updates['data'])) {
-			echo $this->getUpdates($updates);
+			echo $this->getUpdates($updates, $group_entries);
 		}
 
 		wp_die();
 	}
 
 	public function clearDebugLogFileStat(): void {
-		$logController = new LogController();
-		$path          = $logController->getLogFilePath();
+		$path = $this->logModel->getLogFilePath();
 		if (is_file($path) && file_exists($path)) {
 			clearstatcache(true, $path);
 		}
 	}
 
-	public function getUpdates( $updates ): string {
+	public function getUpdates( $updates, bool $group_entries = true ): string {
 		$formatted = array_map(function ( $row ) {
 			if (empty($row)) {
 				return;
@@ -68,9 +74,15 @@ class LiveUpdatesController extends BaseController {
 			];
 		}, $updates['data']);
 
+		$entries = array_values(array_filter($formatted));
+
+		if ($group_entries) {
+			$entries = LogModel::groupEntries($entries);
+		}
+
 		return json_encode([
 			'action' => $updates['action'],
-			'data'   => $formatted,
+			'data'   => $entries,
 		]);
 	}
 }

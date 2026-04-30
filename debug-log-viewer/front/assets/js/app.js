@@ -1,11 +1,13 @@
 /* global $, location */
 import 'bootstrap/js/dist/modal'
 import 'bootstrap/js/dist/toast'
+import 'bootstrap/js/dist/tooltip'
 import 'datatables.net-buttons-bs5'
 import 'datatables.net-buttons/js/buttons.colVis.mjs'
 import 'datatables.net-buttons/js/buttons.html5.mjs'
 import 'datatables.net-searchbuilder-bs5'
 
+import 'datatables.net-bs5/css/dataTables.bootstrap5.min.css'
 import 'datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css'
 import 'datatables.net-searchbuilder-bs5/css/searchBuilder.bootstrap5.min.css'
 import 'bootstrap/dist/css/bootstrap.min.css'

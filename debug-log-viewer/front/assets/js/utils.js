@@ -24,8 +24,15 @@ export function showToast (message, level) {
     return // Prevent errors if the toast element is missing
   }
 
-  // Handle Error objects
-  const displayMessage = message instanceof Error ? message.message : message
+  // Handle Error objects and jQuery jqXHR objects (e.g. wp_send_json_error with 4xx status)
+  let displayMessage
+  if (message instanceof Error) {
+    displayMessage = message.message
+  } else if (message && typeof message === 'object' && message.responseJSON) {
+    displayMessage = message.responseJSON.data || message.responseJSON.message || message.statusText || String(message)
+  } else {
+    displayMessage = message
+  }
 
   // Set the message
   $toastBody.text(displayMessage)

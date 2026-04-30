@@ -15,8 +15,8 @@ class EmailService {
 	public $body;
 	public $notificationController;
 
-	public function __construct() {
-		$this->notificationController = new AlertController();
+	public function __construct( ?AlertController $notificationController = null ) {
+		$this->notificationController = $notificationController ?? new AlertController();
 	}
 
 	public function setBody( $body ) {
@@ -51,20 +51,22 @@ class EmailService {
 
 	private function renderTable( $errors ) {
 		$body     = '';
-		$td_style = ' style="border-bottom:1px solid #ddd; padding:10px"';
-		$row      = '' .
-			'<tr>' .
-			'    <td ' . $td_style . '>%s</td>' .
-			'    <td ' . $td_style . '>%s</td>' .
-			'    <td ' . $td_style . '>%s</td>' .
-			'    <td ' . $td_style . '>%s</td>' .
-			'    <td ' . $td_style . '>%s</td>' .
-			'    <td ' . $td_style . '>%d</td>' .
-			'</tr>';
+		$td_style_odd  = ' style="border-bottom: 1px solid #e8eef8; color: #4c4c4c; padding: 10px 12px; vertical-align: top;"';
+		$td_style_even = ' style="background-color: #f7f9ff; border-bottom: 1px solid #e8eef8; color: #4c4c4c; padding: 10px 12px; vertical-align: top;"';
 
 		$index = 1;
 		foreach ($this->notificationController->getLevelsToReport() as $level) {
 			foreach ($errors[ $level ] as $hash => $error) {
+				$td_style = ($index % 2 === 0) ? $td_style_even : $td_style_odd;
+				$row      = '' .
+					'<tr>' .
+					'    <td ' . $td_style . '>%s</td>' .
+					'    <td ' . $td_style . '>%s</td>' .
+					'    <td ' . $td_style . '>%s</td>' .
+					'    <td ' . $td_style . '>%s</td>' .
+					'    <td ' . $td_style . '>%s</td>' .
+					'    <td ' . $td_style . '>%d</td>' .
+					'</tr>';
 				$body  .= sprintf($row, $index, $error['type'], $error['description']['text'], $error['file'], $error['line'], $error['hits']);
 				$index += 1;
 			}
