@@ -7,7 +7,6 @@ if (!defined('ABSPATH')) {
 $id = isset($id) ? $id : 'next-schedule-info';
 $is_scheduled = isset($is_scheduled) ? $is_scheduled : false;
 $next_run_human = isset($next_run_human) ? $next_run_human : '';
-$label = isset($label) ? $label : __('Next check:', 'debug-log-viewer');
 $class = isset($class) ? $class : '';
 $dynamic = isset($dynamic) ? $dynamic : false;
 ?>
@@ -24,7 +23,6 @@ $dynamic = isset($dynamic) ? $dynamic : false;
     <!-- Static server-rendered -->
     <div id="<?php echo esc_attr($id); ?>" class="next-schedule-info<?php echo $class ? ' ' . esc_attr($class) : ''; ?>">
         <p>
-            <strong><?php echo esc_html($label); ?></strong>
             <span class="next-run-time"><?php echo esc_html($next_run_human); ?></span>
         </p>
     </div>
@@ -32,7 +30,6 @@ $dynamic = isset($dynamic) ? $dynamic : false;
     <!-- Debug fallback for empty next_run_human -->
     <div id="<?php echo esc_attr($id); ?>" class="next-schedule-info calculating-state<?php echo $class ? ' ' . esc_attr($class) : ''; ?>">
         <p>
-            <strong><?php echo esc_html($label); ?></strong>
             <span class="next-run-time"><?php esc_html_e('Calculating...', 'debug-log-viewer'); ?></span>
         </p>
     </div>

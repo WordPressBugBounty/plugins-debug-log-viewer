@@ -28,7 +28,7 @@ class AlertController {
 			'daily'      => __('Daily', 'debug-log-viewer'),
 			'weekly'     => __('Weekly', 'debug-log-viewer'),
 		];
-		$this->options          = get_option($this->buildUniqueEventName());
+		$this->options = get_option($this->buildUniqueEventName());
 	}
 
 	public function buildUniqueEventName() {
@@ -37,10 +37,18 @@ class AlertController {
 
 	public function getNotificationEmails() {
 		if ($this->options && array_key_exists('dbg_lv_notifications_emails', $this->options)) {
-			return $this->options['dbg_lv_notifications_emails'];
+			return $this->limitNotificationEmails($this->options['dbg_lv_notifications_emails']);
 		}
 
 		return [];
+	}
+
+	private function limitNotificationEmails( array $emails ): array {
+		if (FreemiusController::is_premium()) {
+			return $emails;
+		}
+
+		return array_slice($emails, 0, 1);
 	}
 
 	public function isEnabled() {

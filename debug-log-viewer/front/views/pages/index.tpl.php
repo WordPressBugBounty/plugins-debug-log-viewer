@@ -63,7 +63,7 @@ class LogView
 							<button class="tab-button <?php echo $current_tab === 'cleanup' ? 'active' : ''; ?>"
 								id="cleanup-tab-btn"
 								type="button">
-								<i class="fa-solid fa-broom"></i>
+								<i class="fa-solid fa-brush"></i>
 								<span><?php esc_html_e('Cleanup', 'debug-log-viewer'); ?></span>
 							</button>
 						</div>

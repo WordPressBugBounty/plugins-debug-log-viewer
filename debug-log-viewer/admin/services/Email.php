@@ -49,6 +49,35 @@ class EmailService {
 		$this->setBody($data);
 	}
 
+	/**
+	 * Loads a template file and replaces each {{placeholder}} with the
+	 * corresponding value from $replacements, then sets the email body.
+	 *
+	 * @param string               $template     Template filename inside templates/email/.
+	 * @param array<string,string> $replacements Map of placeholder names (without braces) to values.
+	 */
+	public function prepareFromTemplate( string $template, array $replacements ): void {
+		$path = realpath(__DIR__) . '/../templates/email/' . $template;
+		if (false === $path || !is_readable($path)) {
+			throw new \RuntimeException('Email template not found: ' . $template);
+		}
+
+		$data = file_get_contents($path);
+		if ($data === false) {
+			throw new \RuntimeException('Failed to read email template: ' . $template);
+		}
+
+		// Always inject the standard placeholders.
+		$replacements['dbg_lv_website']        = esc_url( $replacements['dbg_lv_website'] ?? get_site_url() );
+		$replacements['dbg_lv_generated_date'] = date_i18n('jS \of F Y \a\t h:i:s A');
+
+		foreach ($replacements as $key => $value) {
+			$data = str_replace('{{' . $key . '}}', (string) $value, $data);
+		}
+
+		$this->setBody($data);
+	}
+
 	private function renderTable( $errors ) {
 		$body     = '';
 		$td_style_odd  = ' style="border-bottom: 1px solid #e8eef8; color: #4c4c4c; padding: 10px 12px; vertical-align: top;"';

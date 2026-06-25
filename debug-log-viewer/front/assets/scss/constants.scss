@@ -4,8 +4,9 @@ $light-blue-bg: #b2a9ff0f;
 $main-background-table-color: #fff;
 $main-font-color: #4c4c4c;
 $main-theme-color: #0d6efd;
+$main-theme-color-dark: #0b5ed7;   // primary hover/active (Bootstrap btn-primary hover)
 
-$danger-color: #f84042;
+$danger-color: #dc3545;
 $contrast-green: #37ae3b;
 $light-gray: #bebebe;
 $dark-blue: #040047;
@@ -17,4 +18,82 @@ $body-color: #f9f9f9;
 
 $block-box-shadow: 0 .125rem .25rem rgba(0,0,0,.05);
 $border-color:transparent;
-$block-bg-color: #ededf2;
+$block-bg-color: #ededf2b5;
+
+// ── Card shadow ────────────────────────────────────────────────────
+$card-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+
+// ── Surfaces ──────────────────────────────────────────────────────
+$surface-color: #fff;               // card / panel background
+$surface-subtle: #f3f4f6;           // subtle bg + thin dividers
+$surface-light: #f8f9fa;            // secondary surface (panel headers, disabled states)
+$surface-hover: #fafafa;            // subtle hover (table rows, footers)
+$surface-blue-tint: #e8f0fe;        // icon-wrap blue tint background
+$surface-blue-light: #dbeafe;       // very light blue (count badges, highlights)
+$surface-primary-hover: #eff6ff;    // very light blue hover (buttons, links)
+
+// ── Text ──────────────────────────────────────────────────────────
+$text-heading: #111827;             // strong card / section headings
+$text-body: #374151;                // primary body text
+$text-secondary: #6b7280;           // secondary / description text
+$text-muted: #9ca3af;               // very muted text (empty states, labels)
+$text-input: #212529;               // form input text colour
+
+// ── Borders ───────────────────────────────────────────────────────
+$border-light: #f0f0f0;             // light card / header borders
+$border-input: #d1d5db;             // form input / control borders
+$border-muted: #dee2e6;             // general purpose borders
+
+// ── Focus ─────────────────────────────────────────────────────────
+$focus-border: #86b7fe;             // input focus ring border colour
+
+// ── Toggle switch ─────────────────────────────────────────────────
+$toggle-off-bg: #d1d5db;            // toggle track background when OFF
+
+// ── Success ───────────────────────────────────────────────────────
+$success-color: #28a745;            // primary success green
+$success-color-medium: #22c55e;     // bright green (progress bar)
+$success-color-strong: #16a34a;     // green text (ok labels, reductions)
+$success-color-dark: #15803d;       // dark green (badge text)
+$success-bg: #dcfce7;               // success badge background
+$success-bg-soft: #d4edda;          // success info-box background
+
+// ── Warning ───────────────────────────────────────────────────────
+$warning-color: #f59e0b;            // primary warning amber
+$warning-color-orange: #fd7e14;     // orange warning (severity icons)
+$warning-color-border: #ffc107;     // warning accent / border
+$warning-color-dark: #b45309;       // dark amber text (quota labels)
+$warning-bg: #fff3cd;               // warning info-box background
+
+// ── Danger ────────────────────────────────────────────────────────
+// Note: $danger-color was #f84042, now unified to Bootstrap #dc3545
+$danger-color-hover: #c82333;       // danger hover (darker)
+$danger-color-dark: #dc2626;        // dark red (disable-btn hover, badge label)
+$danger-color-darker: #b91c1c;      // very dark red (badge text)
+$danger-bg: #fee2e2;                // light red background
+$danger-bg-light: #fff5f5;          // very light red hover
+
+// ── Gradients ─────────────────────────────────────────────────────
+$gradient-pro-start: #667eea;       // purple-blue (pro badge, modal header)
+$gradient-pro-end: #764ba2;         // purple (pro badge, modal header)
+$gradient-primary-end: #4c84ff;     // primary gradient end (paired with $main-theme-color)
+
+// ── Log entry type badge colors ────────────────────────────────────
+$badge-notice-bg: #d4f5e2;
+$badge-warning-bg: rgb(255 213 125 / 88%);
+$badge-warning-color: #a46200;
+$badge-fatal-bg: #f8d7da;
+$badge-database-bg: #e2d9f3;
+$badge-database-color: #6f42c1;
+$badge-parse-bg: #cfe8ff;
+$badge-parse-color: #0366d6;
+$badge-deprecated-bg: #e2e3e5;
+$badge-custom-bg: #d0e7ff;
+$badge-custom-color: #007bff;
+
+// ── Table header ──────────────────────────────────────────────────
+$table-header-bg: #eaecef;
+$table-header-color: rgb(135, 138, 153);
+
+// ── WordPress admin ───────────────────────────────────────────────
+$wp-admin-dark: #23282d;            // WordPress admin sidebar / tooltip dark colour

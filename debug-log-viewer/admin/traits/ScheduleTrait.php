@@ -29,6 +29,7 @@ trait ScheduleTrait {
 
 		$action     = $options['action'];
 		$recurrence = $options['dbg_lv_notifications_email_recurrence'];
+		$options['dbg_lv_notifications_emails'] = $this->limitNotificationEmails($options['dbg_lv_notifications_emails'] ?? []);
 
 		$time = new \DateTime();
 		$time->add($this->getScheduleInterval($recurrence));
@@ -39,6 +40,15 @@ trait ScheduleTrait {
 
 		update_option($event, $options);
 	}
+
+	protected function limitNotificationEmails( array $emails ): array {
+		if (\DebugLogViewer\Admin\Controllers\FreemiusController::is_premium()) {
+			return $emails;
+		}
+
+		return array_slice($emails, 0, 1);
+	}
+
 
 	// Fire if the notification is disabled or on plugin deactivation (uninstalling)
 	public function deleteWpScheduleEvent( $event ) {
@@ -85,24 +95,24 @@ trait ScheduleTrait {
 			// phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$levels          = isset($_POST['levels']) ? array_map('sanitize_text_field', wp_unslash($_POST['levels'])) : [];
 
-			$emails = array_filter($emails, 'is_email');
+			$emails = $this->limitNotificationEmails(array_filter($emails, 'is_email'));
 
 			if (empty($emails)) {
-				wp_send_json_error(__('At least one valid email address is required', 'debug-log-viewer'));
+				wp_send_json_error(__('At least one valid email is required', 'debug-log-viewer'));
 			}
 
 			if (!$status) {
-				wp_send_json_error(__('Alert status was not provided', 'debug-log-viewer'));
+				wp_send_json_error(__('Alert status missing', 'debug-log-viewer'));
 			}
 
 			if ($status == 'enable' && empty($levels)) {
-				wp_send_json_error(__('At least one error level must be selected', 'debug-log-viewer'));
+				wp_send_json_error(__('Select at least one error level', 'debug-log-viewer'));
 			}
 
 			$notificator = $this->notificationController;
 			// Validate field recurrence only if alerts are turn on
 			if ($status == 'enable' && ( !isset($recurrence) || !array_key_exists($recurrence, $notificator->emailRecurrences) )) {
-				wp_send_json_error(__('An invalid value received', 'debug-log-viewer'));
+				wp_send_json_error(__('Invalid recurrence value', 'debug-log-viewer'));
 			}
 
 			$event = $notificator->buildUniqueEventName();

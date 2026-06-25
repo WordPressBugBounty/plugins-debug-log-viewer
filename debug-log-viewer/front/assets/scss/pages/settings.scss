@@ -1,94 +1,143 @@
 @use "../constants" as *;
+@use "../components/settings-card" as *;
 
 .settings {
-    form {
-        .settings-group {
-            padding: 15px 25px;
-            border-radius: 5px;
-            background-color: #fff;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-            margin-top: 1rem;
+	margin-top: 2rem;
 
-            p {
-                color: $main-font-color;
-                line-height: 1.6;
-                font-size: 14px;
-            }
+	// ── Settings-card pattern ─────────────────────────────────────
+	@include settings-cards(2rem, 1rem, 1.25rem 1.25rem 1rem 1.25rem);
 
-            label {
-                display: block;
-                margin-bottom: 1rem;
-                font-weight: 500;
-                color: $main-font-color;
-            }
+	// ── Pill radio toggle ─────────────────────────────────────────
+	.pill-radio-group {
+		display: flex;
+		background: $surface-subtle;
+		border-radius: 999px;
+		padding: 3px;
 
-            #dbg_lv_timezone {
-                border: 1px solid #8c8f9436;
-            }
+		.pill-radio {
+			position: relative;
+			cursor: pointer;
+			display: block;
+			padding: 5px 15px;
+			border-radius: 999px;
+			font-weight: 500;
+			color: $text-secondary;
+			transition: all 0.15s ease;
+			user-select: none;
+			white-space: nowrap;
 
-            .form-check {
-                padding-left: 0;
+			input[type="radio"] {
+				position: absolute;
+				opacity: 0;
+				width: 0;
+				height: 0;
+				pointer-events: none;
+			}
 
-                .form-check-label {
-                    display: flex;
-                    align-items: center;
-                    cursor: pointer;
+			&.active {
+				background: $main-theme-color;
+				color: $white;
+				box-shadow: 0 1px 3px rgba($main-theme-color, 0.35);
+			}
+		}
+	}
 
-                    input {
-                        margin-left: 0;
-                    }
+	// ── Toggle switch (iOS style) ─────────────────────────────────
+	.toggle-switch {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		cursor: pointer;
+		margin: 0;
 
-                    .form-check-input:checked {
-                        background-color: transparent;
-                    }
+		input[type="checkbox"] {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+			pointer-events: none;
+		}
 
-                    .form-check-sign {
-                        margin-right: 0.5rem;
-                    }
+		.toggle-slider {
+			position: relative;
+			width: 44px;
+			height: 24px;
+			min-width: 44px;
+			background: $toggle-off-bg;
+			border-radius: 999px;
+			transition: background 0.2s ease;
+			flex-shrink: 0;
 
-                    span {
-                        font-weight: 400;
-                    }
+			&::after {
+				content: '';
+				position: absolute;
+				top: 3px;
+				left: 3px;
+				width: 18px;
+				height: 18px;
+				background: $white;
+				border-radius: 50%;
+				transition: transform 0.2s ease;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+			}
+		}
 
-                    .tooltip-icon {
-                        margin-left: 0.5rem;
-                        color: #0073aa;
-                        font-size: 14px;
-                        cursor: help;
-                    }
-                }
-            }
+		input[type="checkbox"]:checked ~ .toggle-slider {
+			background: $main-theme-color;
 
-            input[type="submit"] {
-                padding: 0.5rem 1.25rem;
-                color: #fff;
-                font-weight: 500;
-                transition: all 0.2s ease;
-                display: block;
+			&::after {
+				transform: translateX(20px);
+			}
+		}
 
-                &:disabled {
-                    opacity: 0.65;
-                    cursor: not-allowed;
-                }
-            }
-        }
-    }
+		.toggle-label {
+			font-weight: 500;
+			color: $text-secondary;
+			min-width: 50px;
+		}
+	}
+
+	// ── Select dropdown ───────────────────────────────────────────
+	.settings-select {
+		border: 1px solid $border-input;
+		border-radius: 8px;
+		padding: 6px 28px 6px 10px;
+		background: $surface-color;
+		color: $text-body;
+		cursor: pointer;
+		outline: none;
+		appearance: auto;
+		max-width: 180px;
+
+		&:focus {
+			border-color: $main-theme-color;
+			box-shadow: 0 0 0 3px rgba($main-theme-color, 0.1);
+		}
+	}
+
+}
+
+// ── Responsive ────────────────────────────────────────────────────
+@media (max-width: 900px) {
+	.settings .settings-cards-grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 @media (max-width: 768px) {
-    .settings {
-        padding: 1rem;
-    }
+	.settings {
+		padding: 1rem;
+	}
 }
 
-// Bootstrap tooltip customizations
+// ── Bootstrap tooltip overrides ───────────────────────────────────
 .tooltip {
-    font-size: 0.85rem;
+	font-size: 0.85rem;
 
-    .tooltip-inner {
-        max-width: 250px;
-        padding: 0.5rem 0.75rem;
-        background-color: #23282d;
-        border-radius: 0.25rem;
-    }
+	.tooltip-inner {
+		max-width: 250px;
+		padding: 0.5rem 0.75rem;
+			background-color: $wp-admin-dark;
+		border-radius: 0.25rem;
+	}
 }

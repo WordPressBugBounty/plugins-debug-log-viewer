@@ -17,6 +17,7 @@ if (! defined('ABSPATH')) {
 use DebugLogViewer\Admin\Services\LogCleanupService;
 use DebugLogViewer\Admin\Services\EmailService;
 use DebugLogViewer\Admin\Traits\ScheduleTrait;
+use DebugLogViewer\Admin\Controllers\FreemiusController;
 
 require_once realpath(__DIR__) . '/BaseController.php';
 require_once realpath(__DIR__) . '/../services/LogCleanup.php';
@@ -55,7 +56,7 @@ class CleanupController extends BaseController
 	public function schedule_cleanup($recurrence = 'daily')
 	{
 		// Free users can only use daily schedule
-		if (!dbg_lv()->is_premium() && $recurrence !== 'daily') {
+		if (!FreemiusController::is_premium() && $recurrence !== 'daily') {
 			$recurrence = 'daily';
 		}
 
@@ -235,15 +236,16 @@ class CleanupController extends BaseController
 	private function log_cleanup_result($result)
 	{
 		// Only log history for Pro users (cleanup history is a Pro feature)
-		if (! dbg_lv()->is_premium()) {
+		if (! FreemiusController::is_premium()) {
 			return;
 		}
 
 		$history = get_option(LogCleanupService::OPTION_CLEANUP_HISTORY, []);
 
 		$history[] = array(
-			'timestamp' => current_time('mysql'),
+			'timestamp' => gmdate('Y-m-d H:i:s'),
 			'success'   => $result['success'],
+			'skipped'   => $result['skipped'] ?? false,
 			'message'   => $result['message'],
 			'old_size'  => $result['old_size'] ?? 0,
 			'new_size'  => $result['new_size'] ?? 0,
@@ -272,33 +274,32 @@ class CleanupController extends BaseController
 			return;
 		}
 
-		$admin_email = get_option('admin_email');
-		$site_name   = get_option('blogname');
-		$old_size_mb = round($result['old_size'] / 1024 / 1024, 2);
-		$new_size_mb = round($result['new_size'] / 1024 / 1024, 2);
+		$admin_email     = get_option('admin_email');
+		$site_name       = get_option('blogname');
+		$old_size        = isset($result['old_size']) ? (int) $result['old_size'] : 0;
+		$new_size        = isset($result['new_size']) ? (int) $result['new_size'] : 0;
+		$reduction_bytes = max(0, $old_size - $new_size);
+		$reduction_pct   = $old_size > 0 ? round(($reduction_bytes / $old_size) * 100, 1) : 0;
 
 		$email_service = new EmailService();
-		$email_service->setEmails(array($admin_email));
+		$email_service->setEmails([ $admin_email ]);
 		$email_service->setSubject(
 			sprintf('[%s] Debug Log Auto-Cleanup Performed', $site_name)
 		);
-		$email_service->setBody(
-			sprintf(
-				"<p>Debug Log Auto-Cleanup was performed on <strong>%s</strong></p>" .
-					"<h3>Details:</h3>" .
-					"<ul>" .
-					"<li><strong>Previous size:</strong> %s MB</li>" .
-					"<li><strong>New size:</strong> %s MB</li>" .
-					"<li><strong>Method:</strong> %s</li>" .
-					"<li><strong>Time:</strong> %s</li>" .
-					"</ul>" .
-					"<p><em>This is an automated notification from Debug Log Viewer plugin.</em></p>",
-				esc_html($site_name),
-				number_format($old_size_mb, 2),
-				number_format($new_size_mb, 2),
-				esc_html($result['method'] ?? 'N/A'),
-				current_time('mysql')
-			)
+		$email_service->prepareFromTemplate(
+			'cleanup.tpl',
+			[
+				'dbg_lv_site_name' => esc_html($site_name),
+				'dbg_lv_website'   => esc_url( get_site_url() ),
+				'dbg_lv_old_size'  => $old_size > 0 ? size_format($old_size, 2) : __('N/A', 'debug-log-viewer'),
+				'dbg_lv_new_size'  => $new_size > 0 ? size_format($new_size, 2) : __('N/A', 'debug-log-viewer'),
+
+				'dbg_lv_reduction' => $reduction_bytes > 0
+					? sprintf('-%s (%.1f%%)', size_format($reduction_bytes, 2), $reduction_pct)
+					: '—',
+				'dbg_lv_method'    => esc_html(LogCleanupService::get_method_label($result['method'] ?? '')),
+				'dbg_lv_time'      => date_i18n(get_option('date_format') . ' ' . get_option('time_format')),
+			]
 		);
 		$email_service->send();
 	}
@@ -437,7 +438,7 @@ class CleanupController extends BaseController
 	public function getCleanupHistory($limit = 10)
 	{
 		// Cleanup history is a Pro-only feature
-		if (! dbg_lv()->is_premium()) {
+		if (! FreemiusController::is_premium()) {
 			return [];
 		}
 
@@ -510,10 +511,10 @@ class CleanupController extends BaseController
 		if ($validated['cleanupEnabled']) {
 			$schedule = isset($_POST['cleanup_schedule']) ? sanitize_text_field(wp_unslash($_POST['cleanup_schedule'])) : 'daily';
 			$this->schedule_cleanup($schedule);
-			$message = __('Auto-Cleanup enabled successfully', 'debug-log-viewer');
+			$message = __('Auto-Cleanup enabled', 'debug-log-viewer');
 		} else {
 			$this->unschedule_cleanup();
-			$message = __('Auto-Cleanup disabled successfully', 'debug-log-viewer');
+			$message = __('Auto-Cleanup disabled', 'debug-log-viewer');
 		}
 
 		wp_send_json_success([

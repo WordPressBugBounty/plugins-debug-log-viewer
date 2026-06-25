@@ -1,9 +1,11 @@
+@use "../constants" as *;
+
 .scroll-top {
     position: fixed;
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: #fff;
+    background: $surface-color;
     bottom: 100px;
     right: 30px;
     text-decoration: none;
@@ -17,7 +19,7 @@
     }
 
     svg {
-        color: #fff;
+        color: $white;
         margin-bottom: 15px;
     }
 }

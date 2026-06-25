@@ -10,6 +10,7 @@ use DebugLogViewer\Admin\Traits\ScheduleTrait;
 use DebugLogViewer\Admin\Models\LogModel;
 use DebugLogViewer\Admin\Helpers\Utils;
 use DebugLogViewer\Admin\Services\LogCleanupService;
+use DebugLogViewer\Admin\Controllers\FreemiusController;
 
 require_once realpath(__DIR__) . '/../../vendor/autoload.php';
 require_once realpath(__DIR__) . '/BaseController.php';
@@ -301,27 +302,23 @@ class LogController extends BaseController {
 
 		$mode = isset($_POST['mode']) ? sanitize_text_field(wp_unslash($_POST['mode'])) : null;
 
-		if (!$mode) {
-			wp_send_json_error(__('The "mode" parameter is missing from the request', 'debug-log-viewer'), 400);
-		}
-
 		$allowed_modes = [ 'AUTO', 'MANUAL' ];
 		if (!in_array($mode, $allowed_modes, true)) {
-			wp_send_json_error(__('The specified mode is invalid. Please select either "AUTO" or "MANUAL"', 'debug-log-viewer'), 400);
+			wp_send_json_error(__('Invalid mode value', 'debug-log-viewer'), 400);
 		}
 
 		// Retrieve the current mode setting
 		$current_mode = get_option(LogModel::LOG_UPDATES_MODE_OPTION_NAME);
 		if ($current_mode === $mode) {
 			// If the current value matches the new value, consider it a success
-			wp_send_json_success(__('The updates mode has been successfully updated', 'debug-log-viewer'));
+			wp_send_json_success(__('Update mode saved', 'debug-log-viewer'));
 		}
 
 		// Attempt to update the mode setting
 		if (update_option(LogModel::LOG_UPDATES_MODE_OPTION_NAME, $mode)) {
-			wp_send_json_success(__('The update mode has been successfully updated', 'debug-log-viewer'));
+			wp_send_json_success(__('Update mode saved', 'debug-log-viewer'));
 		} else {
-			wp_send_json_error(__('An error occurred while updating the update mode. Please try again', 'debug-log-viewer'), 500);
+			wp_send_json_error(__('Failed to save update mode', 'debug-log-viewer'), 500);
 		}
 	}
 
@@ -332,26 +329,26 @@ class LogController extends BaseController {
 		$format = isset($_POST['format']) ? sanitize_text_field(wp_unslash($_POST['format'])) : null;
 
 		if (!$format) {
-			wp_send_json_error(__('The "format" parameter is missing from the request', 'debug-log-viewer'), 400);
+			wp_send_json_error(__('Missing parameter: format', 'debug-log-viewer'), 400);
 		}
 
 		$allowed_formats = [ 'ABSOLUTE', 'RELATIVE' ];
 		if (!in_array($format, $allowed_formats, true)) {
-			wp_send_json_error(__('The specified format is invalid. Please select either "ABSOLUTE" or "RELATIVE"', 'debug-log-viewer'), 400);
+			wp_send_json_error(__('Invalid format value', 'debug-log-viewer'), 400);
 		}
 
 		// Retrieve the current format setting
 		$current_format = get_option(LogModel::DATETIME_FORMAT_OPTION_NAME);
 		if ($current_format === $format) {
 			// If the current value matches the new value, consider it a success
-			wp_send_json_success(__('The datetime format has been successfully updated', 'debug-log-viewer'));
+			wp_send_json_success(__('Datetime format saved', 'debug-log-viewer'));
 		}
 
 		// Attempt to update the format setting
 		if (update_option(LogModel::DATETIME_FORMAT_OPTION_NAME, $format)) {
-			wp_send_json_success(__('The datetime format has been successfully updated', 'debug-log-viewer'));
+			wp_send_json_success(__('Datetime format saved', 'debug-log-viewer'));
 		} else {
-			wp_send_json_error(__('An error occurred while updating the datetime format. Please try again', 'debug-log-viewer'), 500);
+			wp_send_json_error(__('Failed to save datetime format', 'debug-log-viewer'), 500);
 		}
 	}
 
@@ -367,11 +364,11 @@ class LogController extends BaseController {
 		$timezone = isset($_POST['timezone']) ? sanitize_text_field(wp_unslash($_POST['timezone'])) : null;
 
 		if ($timezone === null || (!empty($timezone) && false === LogModel::getDateTimeZone($timezone))) {
-			wp_send_json_error('Invalid timezone', 400);
+			wp_send_json_error(__('Invalid timezone', 'debug-log-viewer'), 400);
 		}
 
 		update_user_meta(get_current_user_id(), LogModel::TIMEZONE_OPTION_NAME, $timezone);
-		wp_send_json_success(__('Timezone updated', 'debug-log-viewer'));
+		wp_send_json_success(__('Timezone saved', 'debug-log-viewer'));
 	}
 
 	public function changeGroupEntries() {
@@ -385,7 +382,73 @@ class LogController extends BaseController {
 		}
 
 		update_user_meta(get_current_user_id(), LogModel::GROUP_ENTRIES_OPTION_NAME, $value);
-		wp_send_json_success(__('Setting updated', 'debug-log-viewer'));
+		wp_send_json_success(__('Grouping saved', 'debug-log-viewer'));
+	}
+
+	public function sendTestAlertEmail() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->verifyAjaxRequest();
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$emails = isset($_POST['emails']) ? array_map('sanitize_email', wp_unslash($_POST['emails'])) : [];
+		$emails = $this->limitNotificationEmails(array_filter($emails, 'is_email'));
+
+		if (empty($emails)) {
+			wp_send_json_error(__('At least one valid email address is required', 'debug-log-viewer'));
+		}
+
+		try {
+			$this->notificationController->sendTestEmailToRecipients([
+				'dbg_lv_notifications_emails' => $emails,
+				'dbg_lv_notifications_levels' => $this->notificationController->getLevelsToReport(),
+				'action'                      => $this->notificationController->action,
+			]);
+			wp_send_json_success(__('Test email sent', 'debug-log-viewer'));
+		} catch (\Exception $e) {
+			wp_send_json_error($e->getMessage());
+		}
+	}
+
+	public function changeAutoRefreshInterval() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->verifyAjaxRequest();
+
+		$interval = isset($_POST['interval']) ? (int) sanitize_text_field(wp_unslash($_POST['interval'])) : null;
+		$allowed  = [ 5, 10, 15, 30, 60 ];
+
+		if ($interval === null || !in_array($interval, $allowed, true)) {
+			wp_send_json_error(__('Invalid interval value', 'debug-log-viewer'), 400);
+		}
+
+		update_option(LogModel::AUTO_REFRESH_INTERVAL_OPTION, $interval);
+		wp_send_json_success(__('Refresh interval saved', 'debug-log-viewer'));
+	}
+
+	public function changeScrollMode() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$this->verifyAjaxRequest();
+
+		if (!FreemiusController::is_premium()) {
+			wp_send_json_error(__('This feature requires a Pro plan', 'debug-log-viewer'), 403);
+		}
+
+		$mode    = isset($_POST['mode']) ? sanitize_text_field(wp_unslash($_POST['mode'])) : null;
+		$allowed = [ LogModel::SCROLL_MODE_PAGINATION, LogModel::SCROLL_MODE_INFINITE ];
+
+		if (!in_array($mode, $allowed, true)) {
+			wp_send_json_error(__('Invalid scroll mode value', 'debug-log-viewer'), 400);
+		}
+
+		$current = get_option(LogModel::SCROLL_MODE_OPTION_NAME);
+		if ($current === $mode) {
+			wp_send_json_success(__('Scroll mode saved', 'debug-log-viewer'));
+		}
+
+		if (update_option(LogModel::SCROLL_MODE_OPTION_NAME, $mode)) {
+			wp_send_json_success(__('Scroll mode saved', 'debug-log-viewer'));
+		} else {
+			wp_send_json_error(__('Failed to save scroll mode', 'debug-log-viewer'), 500);
+		}
 	}
 
 	public function isDebugLogPubliclyAccessible() {
@@ -570,7 +633,7 @@ class LogController extends BaseController {
 		}
 
 		wp_send_json_success(array(
-			'message' => __('Auto-Cleanup settings saved successfully.', 'debug-log-viewer'),
+			'message' => __('Cleanup settings saved', 'debug-log-viewer'),
 			'settings' => $validated,
 		));
 	}

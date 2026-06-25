@@ -1,257 +1,449 @@
 @use "../constants" as *;
+@use "../components/settings-card" as *;
 
-.cleanup.section {
-	padding: 25px;
-	border-radius: 5px;
-	background-color: #fff;
-	box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075);
-	margin-top: 1rem;
+.cleanup {
+	margin-top: 2rem;
 
-	// Header Section
-	.section-header {
-		h2 {
-			font-size: 1.5rem;
-			font-weight: 600;
-			color: $main-font-color;
-			display: flex;
-			align-items: center;
-
-			i {
-				color: $main-theme-color;
-			}
-
-			.badge {
-				font-size: 0.65rem;
-				vertical-align: middle;
-			}
-		}
-
-		p {
-			color: $main-font-color;
-			line-height: 1.6;
-			font-size: 14px;
-			margin-bottom: 0;
-		}
+	// ── Quota Card ────────────────────────────────────────────────
+	.cleanup-quota-card {
+		background: $surface-color;
+		border-radius: 5px;
+		box-shadow: $card-box-shadow;
+		padding: 1rem 1.25rem;
+		margin-bottom: 0.75rem;
 	}
 
-	// Progress Bar
-	.progress {
-		border-radius: 0.5rem;
-		box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
-		position: relative;
+	.cleanup-quota-header {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.cleanup-quota-icon-wrap {
+		width: 36px;
+		height: 36px;
+		min-width: 36px;
+		background: $surface-blue-tint;
+		border-radius: 5px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 
-		.progress-bar {
-			position: absolute;
-			left: 0;
-			top: 0;
-			bottom: 0;
-			font-weight: 600;
-			font-size: 0.9rem;
-			transition: width 0.4s ease;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			min-width: 4%;
-
+		i {
+			font-size: 16px;
+			color: $main-theme-color;
 		}
 	}
 
-	// Settings Group (Shared with Settings page)
-	.settings-group {
-		padding: 0;
-		margin-bottom: 1.5rem;
+	.cleanup-quota-info {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+	}
 
-		label {
-			display: block;
-			margin-bottom: 7px;
-			font-weight: 500;
-			color: #444;
+	.cleanup-quota-title {
+		font-weight: 600;
+		font-size: 0.85rem;
+		color: $text-body;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+	}
 
-			.tooltip-icon {
-				margin-left: 0.5rem;
-				cursor: help;
-				color: #6c757d;
-				font-size: 0.85rem;
+	.cleanup-quota-size {
+		font-size: 0.85rem;
+		color: $text-secondary;
+	}
 
-				&:hover {
-					color: #0073aa;
-				}
-			}
+	.cleanup-quota-body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.cleanup-progress {
+		background: $surface-subtle;
+		border-radius: 999px;
+		height: 10px;
+		overflow: hidden;
+	}
+
+	.cleanup-progress-bar {
+		height: 100%;
+		border-radius: 999px;
+		transition: width 0.4s ease;
+		min-width: 2%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		padding-right: 6px;
+		font-size: 0;
+
+		&.bg-success {
+			background: $success-color-medium;
 		}
-
-		input[type="text"],
-		input[type="email"],
-		input[type="number"],
-		select,
-		textarea {
-			display: block;
-			width: 100%;
-			padding: 0.375rem 0.75rem;
-			font-size: 13px;
-			font-weight: 400;
-			height: 30px;
-			line-height: 1.5;
-			color: #212529;
-			background-color: #fff;
-			background-clip: padding-box;
-			border: 1px solid #ced4da;
-			appearance: none;
-			border-radius: 0.25rem;
-			transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-
-			&:focus {
-				color: #212529;
-				background-color: #fff;
-				border-color: #86b7fe;
-				outline: 0;
-				box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-			}
-
-			&.regular-text {
-				max-width: 100%;
-				min-width: 250px;
-			}
-
-			&:disabled {
-				background-color: #f5f5f5;
-				color: #6c757d;
-				cursor: not-allowed;
-				opacity: 0.7;
-			}
+		&.bg-warning {
+			background: $warning-color;
 		}
-
-		select {
-			cursor: pointer;
-		}
-
-		.form-check-label {
-			display: flex;
-			align-items: center;
-			cursor: pointer;
-			font-weight: 500;
-			margin-bottom: 0;
-
-			.form-check-input {
-				margin-right: 0.75rem;
-			}
-
-			.tooltip-icon {
-				margin-left: 0.5rem;
-			}
-
-			&.disabled-group {
-				opacity: 0.6;
-				cursor: not-allowed;
-			}
-		}
-
-		.form-text {
-			display: block;
-			margin-top: 0.5rem;
-			font-size: 0.85rem;
-		}
-
-		.input-group {
-			display: flex;
-			align-items: stretch;
-			width: 100%;
-
-			input[type="number"],
-			input[type="text"] {
-				flex: 1;
-				min-width: 0;
-				width: auto;
-				border-top-right-radius: 0;
-				border-bottom-right-radius: 0;
-
-				&.regular-text {
-					max-width: none;
-					min-width: 0;
-				}
-			}
-
-			.input-group-text {
-				display: flex;
-				align-items: center;
-				padding: 0.375rem 0.75rem;
-				font-size: 10px;
-				font-weight: 400;
-				line-height: 1.5;
-				color: #212529;
-				text-align: center;
-				white-space: nowrap;
-				background-color: #e9ecef;
-				border: 1px solid #ced4da;
-				border-left: none;
-				border-top-right-radius: 0.25rem;
-				border-bottom-right-radius: 0.25rem;
-			}
+		&.bg-danger {
+			background: $danger-color;
 		}
 	}
 
+	.cleanup-quota-msg {
+		font-size: 0.82rem;
+		margin: 0;
+		font-weight: 500;
 
-	// Alert Box
-	.alert {
-		border-radius: 0.375rem;
-		padding: 1rem;
-		font-size: 0.9rem;
+		&.quota-ok {
+			color: $success-color-strong;
+		}
+		&.quota-warning {
+			color: $warning-color-dark;
+		}
+		&.quota-danger {
+			color: $danger-color-dark;
+		}
+	}
+
+	// ── Layout ────────────────────────────────────────────────────
+	.cleanup-layout {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	// ── Main Card ─────────────────────────────────────────────────
+	.cleanup-card {
+		background: $surface-color;
+		border-radius: 5px;
+		box-shadow: $card-box-shadow;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.cleanup-card-header {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 1rem 1.25rem;
+		border-bottom: 1px solid $border-light;
+	}
+
+	.cleanup-card-icon-wrap {
+		width: 36px;
+		height: 36px;
+		min-width: 36px;
+		background: $surface-blue-tint;
+		border-radius: 5px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		i {
-			margin-right: 0.5rem;
-		}
-
-		&.alert-info {
-			background-color: #dbeafe;
-			border-color: #bfdbfe;
-			color: #1e40af;
-		}
-
-		&.alert-warning {
-			background-color: #fef3c7;
-			border-color: #fde68a;
-			color: #92400e;
+			font-size: 16px;
+			color: $main-theme-color;
 		}
 	}
-}
 
-// Responsive adjustments
-@media (max-width: 1200px) {
-	.cleanup.section {
-		max-width: 100%;
-		padding: 1rem;
+	.cleanup-card-info {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
 	}
-}
 
-@media (max-width: 768px) {
-	.cleanup.section {
-		padding: 0.75rem;
+	.cleanup-card-title {
+		font-weight: 600;
+		font-size: 0.95rem;
+		color: $text-heading;
+	}
 
-		.section-header {
-			h2 {
-				font-size: 1.25rem;
+	.cleanup-card-desc {
+		font-size: 0.82rem;
+		color: $text-secondary;
+	}
+
+	.cleanup-card-body {
+		padding: 1rem 1.25rem 1.25rem;
+		flex: 1;
+	}
+
+	.cleanup-card-footer {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.875rem 1.25rem;
+		border-top: 1px solid $border-light;
+		background: $surface-hover;
+		justify-content: space-between;
+	}
+
+	// ── Settings-card pattern ─────────────────────────────────────
+	@include settings-cards(0.75rem, 0.75rem, 1rem 1.25rem, 0.9rem, 12px, 1.4);
+
+	// ── Form Controls ─────────────────────────────────────────────
+	.cleanup-input {
+		padding: 0.35rem 0.6rem;
+		font-size: 13px;
+		line-height: 1.5;
+		color: $text-input;
+		background: $surface-color;
+		border: 1px solid $border-input;
+		border-radius: 0.25rem;
+		transition:
+			border-color 0.15s ease-in-out,
+			box-shadow 0.15s ease-in-out;
+		width: 80px;
+
+		&:focus {
+			border-color: $focus-border;
+			outline: 0;
+			box-shadow: 0 0 0 0.2rem rgba($main-theme-color, 0.2);
+		}
+
+		&[readonly] {
+			background: $surface-light;
+			color: $text-secondary;
+			cursor: not-allowed;
+		}
+	}
+
+	.cleanup-select {
+		padding: 0.35rem 0.6rem;
+		font-size: 13px;
+		line-height: 1.5;
+		color: $text-input;
+		background: $surface-color;
+		border: 1px solid $border-input;
+		border-radius: 0.25rem;
+		cursor: pointer;
+		width: auto;
+		min-width: 140px;
+		transition:
+			border-color 0.15s ease-in-out,
+			box-shadow 0.15s ease-in-out;
+
+		&:focus {
+			border-color: $focus-border;
+			outline: 0;
+			box-shadow: 0 0 0 0.2rem rgba($main-theme-color, 0.2);
+		}
+
+		&[readonly] {
+			background: $surface-light;
+			color: $text-secondary;
+			cursor: not-allowed;
+			pointer-events: none;
+		}
+
+		&:disabled {
+			background: $surface-light;
+			color: $text-secondary;
+			cursor: not-allowed;
+			opacity: 0.7;
+		}
+	}
+
+	.cleanup-input-with-unit {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.cleanup-input-unit {
+		font-size: 12px;
+		font-weight: 600;
+		color: $text-secondary;
+		white-space: nowrap;
+	}
+
+	// ── Toggle Switch (iOS style) ──────────────────────────────────
+	.toggle-switch {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		margin: 0;
+		position: relative;
+		width: 46px;
+		height: 26px;
+
+		input[type="checkbox"] {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		.toggle-slider {
+			position: absolute;
+			inset: 0;
+			background: $toggle-off-bg;
+			border-radius: 999px;
+			transition: background 0.2s ease;
+
+			&::before {
+				content: "";
+				position: absolute;
+				width: 20px;
+				height: 20px;
+				left: 3px;
+				top: 3px;
+				background: $white;
+				border-radius: 50%;
+				transition: transform 0.2s ease;
+				box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 			}
 		}
 
-		form {
+		input:checked + .toggle-slider {
+			background: $main-theme-color;
+		}
+
+		input:checked + .toggle-slider::before {
+			transform: translateX(20px);
+		}
+
+		input:disabled + .toggle-slider {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+	}
+
+	// ── Disable-state button style ─────────────────────────────────
+	.btn.disable {
+		color: $text-secondary;
+		border-color: $border-input;
+		background: transparent;
+
+		&:hover {
+			color: $danger-color-dark;
+			border-color: $danger-color-dark;
+			background: $danger-bg-light;
+		}
+	}
+
+	// ── History Card Specifics ─────────────────────────────────────
+	.cleanup-history-body {
+		padding: 0;
+	}
+
+	.cleanup-history-table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 13px;
+		color: $text-body;
+
+		thead tr {
+			background: $surface-light;
+			border-bottom: 2px solid $border-muted;
+		}
+
+		thead th {
+			padding: 0.7rem 1rem;
+			font-weight: 600;
+			font-size: 12px;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: $text-secondary;
+			white-space: nowrap;
+		}
+
+		tbody tr {
+			border-bottom: 1px solid $surface-subtle;
+			transition: background 0.1s ease;
+
+			&:last-child {
+				border-bottom: none;
+			}
+
+			&:hover {
+				background: $surface-hover;
+			}
+		}
+
+		tbody td {
+			padding: 0.65rem 1rem;
+			vertical-align: middle;
+		}
+	}
+
+	.cleanup-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.3rem;
+		padding: 0.2rem 0.55rem;
+		border-radius: 999px;
+		font-size: 11px;
+		font-weight: 600;
+		white-space: nowrap;
+
+		&.cleanup-badge-success {
+			background: $success-bg;
+			color: $success-color-dark;
+		}
+
+		&.cleanup-badge-failed {
+			background: $danger-bg;
+			color: $danger-color-darker;
+		}
+
+		&.cleanup-badge-skipped {
+			background: $surface-subtle;
+			color: $text-secondary;
+		}
+	}
+
+	.cleanup-reduction {
+		font-size: 12px;
+		font-weight: 600;
+		color: $success-color-strong;
+	}
+
+	.cleanup-history-empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: 2.5rem 1rem;
+		text-align: center;
+		color: $text-muted;
+
+		i {
+			font-size: 2rem;
+			margin-bottom: 0.75rem;
+		}
+
+		p {
+			font-size: 0.875rem;
+			margin: 0;
+			max-width: 360px;
+			line-height: 1.5;
+		}
+	}
+}
+
+// ── Responsive ────────────────────────────────────────────────────
+@media (max-width: 768px) {
+	.cleanup {
+		.settings-cards-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.cleanup-card-footer {
+			flex-wrap: wrap;
+
 			.btn {
 				width: 100%;
-				margin-bottom: 0.5rem;
-
-				&.ms-2 {
-					margin-left: 0 !important;
-				}
 			}
 		}
 
-		.table {
-			font-size: 0.85rem;
+		.cleanup-history-table {
+			font-size: 11px;
 
 			thead th,
 			tbody td {
-				padding: 0.5rem;
+				padding: 0.5rem 0.6rem;
 			}
 		}
 	}

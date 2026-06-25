@@ -82,7 +82,34 @@ export class LogViewerApiService {
 
       // Keep backend data in sync so further requests use the right value
       dbg_lv_backend_data.group_entries = enabled ? '1' : '0'
-      showToast(t('settings_saved_successfully'), 'success')
+      showToast(response.data, 'success')
+    } catch (error) {
+      showToast(error, 'error')
+      throw error
+    }
+  }
+
+  /**
+   * Persist the scroll mode preference via AJAX (Pro only).
+   * @param {'PAGINATION'|'INFINITE'} mode
+   */
+  async changeScrollMode (mode) {
+    try {
+      const response = await jQuery.post({
+        url: ajaxurl,
+        data: {
+          action: 'dbg_lv_change_scroll_mode',
+          mode,
+          wp_nonce: dbg_lv_backend_data.ajax_nonce
+        }
+      })
+
+      if (!response.success) {
+        throw new Error(response.data)
+      }
+
+      dbg_lv_backend_data.scroll_mode = mode
+      showToast(response.data, 'success')
     } catch (error) {
       showToast(error, 'error')
       throw error
@@ -367,4 +394,50 @@ export class LogViewerApiService {
       throw error
     }
   }
+
+  async sendTestAlertEmail (emails) {
+    try {
+      const response = await jQuery.post({
+        url: ajaxurl,
+        data: {
+          action: 'dbg_lv_send_test_alert_email',
+          emails,
+          wp_nonce: dbg_lv_backend_data.ajax_nonce
+        }
+      })
+
+      if (!response.success) {
+        throw new Error(response.data)
+      }
+      showToast(response.data, 'success')
+    } catch (error) {
+      showToast(error, 'error')
+      throw error
+    }
+  }
+
+  async changeAutoRefreshInterval (interval) {
+    try {
+      const response = await jQuery.post({
+        url: ajaxurl,
+        data: {
+          action: 'dbg_lv_change_auto_refresh_interval',
+          interval,
+          wp_nonce: dbg_lv_backend_data.ajax_nonce
+        }
+      })
+
+      if (!response.success) {
+        throw new Error(response.data)
+      }
+
+      dbg_lv_backend_data.log_updates_interval = interval
+      showToast(response.data, 'success')
+    } catch (error) {
+      showToast(error, 'error')
+      throw error
+    }
+  }
+
 }
+

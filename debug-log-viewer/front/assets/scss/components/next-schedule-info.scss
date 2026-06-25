@@ -1,14 +1,16 @@
+@use "../constants" as *;
+
 // Next Schedule Info Component
 // Shared styles for displaying next scheduled run information
 
 .next-schedule-info,
 .next-email-info {
-    background: #d4edda;
+    background: $success-bg-soft;
     padding: 12px;
     border-radius: 5px;
     margin: 0 0 1.5rem;
     margin-top: 1rem;
-    border-left: 4px solid #28a745;
+    border-left: 4px solid $success-color;
     transition: all 0.3s ease;
 
     p {
@@ -16,7 +18,7 @@
         color: #0073aa;
 
         strong {
-            color: #28a745;
+            color: $success-color;
             display: block;
             margin-bottom: 0.25rem;
             font-weight: 600;
@@ -30,7 +32,7 @@
         .next-run-time,
         .next-countdown,
         small {
-            color: #666;
+            color: $text-secondary;
             font-style: italic;
             font-size: 0.9rem;
         }
@@ -54,7 +56,7 @@
 
     // Debug/calculating state (when schedule exists but time is not yet calculated)
     &.calculating-state {
-        background: #fff3cd;
-        border-left-color: #ffc107;
+        background: $warning-bg;
+        border-left-color: $warning-color-border;
     }
 }

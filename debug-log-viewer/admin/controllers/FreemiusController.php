@@ -40,6 +40,15 @@ class FreemiusController {
         }
     }
 
+    public static function is_premium() : bool {
+        try {
+            $fs = ( function_exists( 'DebugLogViewer\\Admin\\Controllers\\dbg_lv' ) ? dbg_lv() : null );
+            return $fs && is_object( $fs ) && $fs->is_premium();
+        } catch ( \Exception $e ) {
+            return false;
+        }
+    }
+
     public static function include_sdk() {
         $freemius_path = __DIR__ . '/../../vendor/freemius/wordpress-sdk/start.php';
         if ( file_exists( $freemius_path ) ) {

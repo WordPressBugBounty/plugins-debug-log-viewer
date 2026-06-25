@@ -6,11 +6,11 @@ namespace DebugLogViewer;
  * Plugin Name: Debug Log Viewer
  * Description: Effortlessly view, search, and manage your WordPress debug.log in the admin dashboard. Real-time monitoring, email alerts, and filtering.
  * Author: lysyiweb
- * Version: 2.2.3
+ * Version: 2.4
  * Tags: wp_debug, debugging, error log, debug
  * Requires PHP: 7.2
- * Tested up to: 6.9
- * Stable tag: 2.2.3
+ * Tested up to: 7.0
+ * Stable tag: 2.4
  * License: GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */

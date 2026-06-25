@@ -139,6 +139,10 @@ export class LogViewerEventHandlers {
     $('input[name="UpdatesModeRadioOptions"]').on('change', async function () {
       const selectedMode = $('input[name="UpdatesModeRadioOptions"]:checked').val()
 
+      // Update pill-radio active class
+      $('input[name="UpdatesModeRadioOptions"]').closest('.pill-radio').removeClass('active')
+      $(this).closest('.pill-radio').addClass('active')
+
       await self.api.changeLogsUpdateMode(selectedMode)
 
       if (selectedMode === 'AUTO') {
@@ -153,12 +157,14 @@ export class LogViewerEventHandlers {
     $('input[name="DatetimeFormatRadioOptions"]').on('change', async function () {
       const selectedFormat = $('input[name="DatetimeFormatRadioOptions"]:checked').val()
 
+      // Update pill-radio active class
+      $('input[name="DatetimeFormatRadioOptions"]').closest('.pill-radio').removeClass('active')
+      $(this).closest('.pill-radio').addClass('active')
+
       await self.api.changeDatetimeFormat(selectedFormat)
 
       // Update the frontend setting for immediate UI updates
-      if (window.dbg_lv_backend_data) {
-        window.dbg_lv_backend_data.datetime_format = selectedFormat
-      }
+      dbg_lv_backend_data.datetime_format = selectedFormat
 
       // Manage relative time updates based on the new format
       if (selectedFormat === DATETIME_FORMAT_RELATIVE) {
@@ -182,9 +188,25 @@ export class LogViewerEventHandlers {
       await self.api.fillInitialData()
     })
 
-    // Group duplicates radio options (lives in Settings tab)
-    $('input[name="GroupEntriesRadioOptions"]').on('change', async function () {
-      const isGrouped = $(this).val() === '1'
+    // Auto refresh interval dropdown
+    $('#dbg_lv_auto_refresh_interval').on('change', async function () {
+      const interval = parseInt($(this).val(), 10)
+
+      await self.api.changeAutoRefreshInterval(interval)
+
+      // Restart live updates with the new interval if in AUTO mode
+      const currentMode = $('input[name="UpdatesModeRadioOptions"]:checked').val()
+      if (currentMode === 'AUTO') {
+        self.ui.stopLiveUpdateLogs()
+        self.ui.startLiveUpdateLogs(() => self.api.updateLogs())
+      }
+    })
+
+    // Group duplicates toggle (lives in Settings tab)
+    $('#GroupEntriesToggle').on('change', async function () {
+      const isGrouped = $(this).is(':checked')
+
+      $(this).siblings('.toggle-label').text(isGrouped ? dbg_lv_backend_data.phrases?.enabled || 'Enabled' : dbg_lv_backend_data.phrases?.disabled || 'Disabled')
 
       await self.api.changeGroupEntries(isGrouped)
 
@@ -194,6 +216,19 @@ export class LogViewerEventHandlers {
       // Reload table with new grouping mode
       self.table.clear().draw()
       await self.api.fillInitialData()
+    })
+
+    // Scroll mode toggle (Pro — lives in Settings tab)
+    $('input[name="ScrollModeRadioOptions"]').on('change', async function () {
+      const selectedMode = $(this).val()
+
+      $('input[name="ScrollModeRadioOptions"]').closest('.pill-radio').removeClass('active')
+      $(this).closest('.pill-radio').addClass('active')
+
+      await self.api.changeScrollMode(selectedMode)
+
+      // Reinitialize DataTable with new mode by reloading the page
+      location.reload()
     })
   }
 

@@ -21,17 +21,17 @@ class Phrases {
 				'debug_mode'                   => __('Debug Mode:', 'debug-log-viewer'),
 				'request_error'                => __('Request Error:', 'debug-log-viewer'),
 				'debug_log_scripts'            => __('Debug Log Scripts:', 'debug-log-viewer'),
-				'logging_enabled_successfully' => __('Logging enabled successfully.', 'debug-log-viewer'),
+				'logging_enabled_successfully' => __('Logging enabled', 'debug-log-viewer'),
 				'debug_scripts'                => __('Debug Scripts:', 'debug-log-viewer'),
 				'display_errors'               => __('Display Errors:', 'debug-log-viewer'),
 				'flush_log_confirmation'       => __('Are you sure? This action cannot be undone after flushing the log.', 'debug-log-viewer'),
-				'log_was_cleared'              => __('The log was cleared.', 'debug-log-viewer'),
-				'log_was_refreshed'            => __('The log was refreshed.', 'debug-log-viewer'),
-				'email_is_not_specified'       => __('Email is not specified.', 'debug-log-viewer'),
-				'notifications_disabled'       => __('Alerts have been disabled.', 'debug-log-viewer'),
+				'log_was_cleared'              => __('Log cleared', 'debug-log-viewer'),
+				'log_was_refreshed'            => __('Log refreshed', 'debug-log-viewer'),
+				'email_is_not_specified'       => __('Enter at least one email address', 'debug-log-viewer'),
+				'notifications_disabled'       => __('Alerts disabled', 'debug-log-viewer'),
 				'disable'                      => __('Disable', 'debug-log-viewer'),
 				'enable'                       => __('Enable', 'debug-log-viewer'),
-				'notifications_enabled'        => __('Alerts have been enabled.', 'debug-log-viewer'),
+				'notifications_enabled'        => __('Alerts enabled', 'debug-log-viewer'),
 				'more'                         => __('More', 'debug-log-viewer'),
 				'show-hide'                    => __('Show/Hide', 'debug-log-viewer'),
 				'clear_log'                    => __('Clear Log', 'debug-log-viewer'),
@@ -85,7 +85,7 @@ class Phrases {
 				'at_least_one_email_required'  => __('At least one email address is required', 'debug-log-viewer'),
 				/* translators: %d: email number/position in the list */
 				'email_not_valid'              => __('Email %d is not valid', 'debug-log-viewer'),
-				'please_select_error_level'    => __('Please select at least one error level to monitor', 'debug-log-viewer'),
+				'please_select_error_level'    => __('Select at least one error level', 'debug-log-viewer'),
 				'email_alerts_form_not_found'  => __('Email alerts form not found', 'debug-log-viewer'),
 
 				// Custom date range phrases
@@ -115,13 +115,13 @@ class Phrases {
 				'upgrade_to_pro'               => __('Upgrade to Pro', 'debug-log-viewer'),
 
 				// Cleanup phrases
-				'settings_saved_successfully'  => __('Settings saved successfully!', 'debug-log-viewer'),
-				'failed_to_save_settings'      => __('Failed to save settings.', 'debug-log-viewer'),
-				'error_saving_settings'        => __('An error occurred while saving settings.', 'debug-log-viewer'),
+				'settings_saved_successfully'  => __('Settings saved', 'debug-log-viewer'),
+				'failed_to_save_settings'      => __('Failed to save settings', 'debug-log-viewer'),
+				'error_saving_settings'        => __('Error saving settings', 'debug-log-viewer'),
 				'running'                      => __('Running...', 'debug-log-viewer'),
-				'cleanup_completed'            => __('Cleanup completed successfully!', 'debug-log-viewer'),
-				'cleanup_failed'               => __('Cleanup failed.', 'debug-log-viewer'),
-				'error_during_cleanup'         => __('An error occurred during cleanup.', 'debug-log-viewer'),
+				'cleanup_completed'            => __('Cleanup completed', 'debug-log-viewer'),
+				'cleanup_failed'               => __('Cleanup failed', 'debug-log-viewer'),
+				'error_during_cleanup'         => __('Error during cleanup', 'debug-log-viewer'),
 
 				// Grouping phrases
 				'group_duplicates'             => __('Group duplicates', 'debug-log-viewer'),

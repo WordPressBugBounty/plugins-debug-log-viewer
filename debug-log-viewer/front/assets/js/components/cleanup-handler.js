@@ -25,7 +25,7 @@ function refreshCleanupStats() {
         if (stats.percentage_used > 0) {
           const clampedPercentage = Math.min(stats.percentage_used, 100)
           const progressClass = clampedPercentage > 90 ? 'bg-danger' : (clampedPercentage > 70 ? 'bg-warning' : 'bg-success')
-          $('.progress-bar')
+          $('.cleanup-progress-bar')
             .css('width', clampedPercentage + '%')
             .attr('aria-valuenow', clampedPercentage)
             .removeClass('bg-danger bg-warning bg-success')
@@ -33,7 +33,7 @@ function refreshCleanupStats() {
             .text(Math.round(clampedPercentage) + '%')
 
           // Update size display
-          $('.progress').prev('.d-flex').find('span').last()
+          $('.cleanup-quota-size')
             .text(stats.current_size_mb.toFixed(2) + ' / ' + stats.max_size_mb.toFixed(0) + ' MB')
         }
 
@@ -85,9 +85,9 @@ function initCleanupHandlers() {
 
     // Update button text and style
     if (isEnabled) {
-      $button.val(t('disable')).removeClass('btn-primary').addClass('btn-danger').prop('disabled', false)
+      $button.val(t('disable')).removeClass('btn-primary').addClass('disable btn-outline-danger').prop('disabled', false)
     } else {
-      $button.val(t('enable')).removeClass('btn-danger').addClass('btn-primary').prop('disabled', false)
+      $button.val(t('enable')).removeClass('disable btn-outline-danger').addClass('btn-primary').prop('disabled', false)
     }
   }
 

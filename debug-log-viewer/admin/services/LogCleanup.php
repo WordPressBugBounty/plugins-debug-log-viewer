@@ -42,6 +42,22 @@ class LogCleanupService
 	const METHOD_ARCHIVE_AND_ROTATE = 'archive';
 
 	/**
+	 * Returns a human-readable label for a given cleanup method identifier.
+	 *
+	 * @param string $method The stored method value.
+	 * @return string
+	 */
+	public static function get_method_label( string $method ): string {
+		$labels = [
+			self::METHOD_TRUNCATE_KEEP_LAST => __( 'Keep Last %', 'debug-log-viewer' ),
+			self::METHOD_CLEAR_FILE         => __( 'Clear File', 'debug-log-viewer' ),
+			self::METHOD_ARCHIVE_AND_ROTATE => __( 'Archive & Rotate', 'debug-log-viewer' ),
+		];
+
+		return $labels[ $method ] ?? ucwords( str_replace( '_', ' ', $method ) );
+	}
+
+	/**
 	 * Validation constants for settings
 	 */
 	const DEFAULT_MAX_LOG_SIZE_MB   = 50;    // Default maximum log file size in megabytes
@@ -101,19 +117,24 @@ class LogCleanupService
 		}
 
 		// Get current file size
+		clearstatcache(true, $this->logFilePath);
 		$current_size = filesize($this->logFilePath);
+
+		// Determine configured method before the size check
+		$cleanup_method = get_option(self::OPTION_CLEANUP_METHOD, self::METHOD_TRUNCATE_KEEP_LAST);
 
 		// Check if cleanup is needed
 		if ($current_size <= $this->maxLogSize) {
 			return [
 				'success' => true,
+				'skipped' => true,
+				'method'  => $cleanup_method,
 				'message' => __('Log file size is within limits. No cleanup needed.', 'debug-log-viewer'),
 				'size'    => $current_size,
 			];
 		}
 
 		// Perform cleanup based on configured method
-		$cleanup_method = get_option(self::OPTION_CLEANUP_METHOD, self::METHOD_TRUNCATE_KEEP_LAST);
 
 		switch ($cleanup_method) {
 			case self::METHOD_CLEAR_FILE:
@@ -241,7 +262,7 @@ class LogCleanupService
 			'old_size'     => $current_size,
 			'new_size'     => filesize($this->logFilePath),
 			'bytes_kept'   => $bytes_copied,
-			'method'       => 'truncateKeepLast',
+			'method'       => self::METHOD_TRUNCATE_KEEP_LAST,
 			'retention'    => ($this->retentionPercentage * 100) . '%',
 		];
 	}

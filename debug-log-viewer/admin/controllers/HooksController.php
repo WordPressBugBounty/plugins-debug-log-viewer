@@ -87,7 +87,21 @@ class HooksController
 		add_action('wp_ajax_dbg_lv_change_group_entries', function () {
 			$this->logController->changeGroupEntries();
 		});
-		
+
+		// Auto refresh interval
+		add_action('wp_ajax_dbg_lv_change_auto_refresh_interval', function () {
+			$this->logController->changeAutoRefreshInterval();
+		});
+
+		// Scroll mode
+		add_action('wp_ajax_dbg_lv_change_scroll_mode', function () {
+			$this->logController->changeScrollMode();
+		});
+
+		// Send test alert email
+		add_action('wp_ajax_dbg_lv_send_test_alert_email', function () {
+			$this->logController->sendTestAlertEmail();
+		});
 		// Save cleanup settings
 		add_action('wp_ajax_dbg_lv_save_cleanup_settings', function () {
 			$this->cleanupController->saveSettings();
@@ -174,15 +188,17 @@ class HooksController
 
 			// Localize script
 			$group_entries_meta = get_user_meta(get_current_user_id(), LogModel::GROUP_ENTRIES_OPTION_NAME, true);
+			$auto_refresh_interval = (int) get_option(LogModel::AUTO_REFRESH_INTERVAL_OPTION, LogModel::DEFAULT_AUTO_REFRESH_INTERVAL);
 			wp_localize_script('dbg_lv_app_js', 'dbg_lv_backend_data', [
-				'ajax_nonce'           => wp_create_nonce('ajax_nonce'),
-				'phrases'              => Phrases::getParsedContentPhrases(),
-				'log_updates_mode'     => get_option(LogModel::LOG_UPDATES_MODE_OPTION_NAME),
-				'datetime_format'      => get_option(LogModel::DATETIME_FORMAT_OPTION_NAME),
-				'group_entries'        => $group_entries_meta !== '' ? $group_entries_meta : '1',
-				'log_updates_interval' => LogModel::LOG_UPDATES_INTERVAL,
-				'is_premium'           => $is_premium,
-				'checkout_url'         => $checkout_url
+				'ajax_nonce'                  => wp_create_nonce('ajax_nonce'),
+				'phrases'                     => Phrases::getParsedContentPhrases(),
+				'log_updates_mode'            => get_option(LogModel::LOG_UPDATES_MODE_OPTION_NAME),
+				'datetime_format'             => get_option(LogModel::DATETIME_FORMAT_OPTION_NAME),
+				'group_entries'               => $group_entries_meta !== '' ? $group_entries_meta : '1',
+				'log_updates_interval'        => $auto_refresh_interval,
+				'scroll_mode'                 => get_option(LogModel::SCROLL_MODE_OPTION_NAME, LogModel::SCROLL_MODE_PAGINATION),
+				'is_premium'                  => $is_premium,
+				'checkout_url'                => $checkout_url
 			]);
 
 			// Add Freemius configuration data

@@ -1,12 +1,21 @@
-/* global $, MutationObserver */
+/* global $, MutationObserver, dbg_lv_backend_data */
 import { t, updateFilterCount } from '../../utils.js'
 import { renderLogTypeBadge, renderDescription, convertToTimestamp, renderDatetime, renderCount } from './renderers.js'
 import { createDropdownMenuItems, isPremium } from './ui-utils.js'
 
 /**
+ * Returns true when the infinite-scroll mode is active for this user.
+ */
+export function isInfiniteScrollMode () {
+  return isPremium() && window.dbg_lv_backend_data?.scroll_mode === 'INFINITE'
+}
+
+/**
  * Creates and returns the DataTable configuration object
  */
 export function createDataTableConfig(initCallbacks) {
+  const infiniteScroll = isInfiniteScrollMode()
+
   return {
     serverSide: false,
     stateSave: true,
@@ -22,7 +31,11 @@ export function createDataTableConfig(initCallbacks) {
       emptyTable: t('empty_log_table'),
       zeroRecords: t('no_matching_records')
     },
+
+    // Pagination vs infinite scroll
+    paging: !infiniteScroll,
     pageLength: 10,
+    ...(infiniteScroll ? { scrollY: '60vh', scrollCollapse: true } : {}),
 
     layout: {
       topStart: null, // remove pageLength from top default position

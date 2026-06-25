@@ -5,9 +5,10 @@ import { t } from '../../utils.js'
  * Handles multiple email inputs for alert notifications
  */
 export class EmailRecipientsManager {
-  constructor (containerSelector = '#email-recipients-container') {
+  constructor (containerSelector = '#email-recipients-container', isPremium = false) {
     this.container = jQuery(containerSelector)
-    this.maxEmails = 3
+    this.addButton = jQuery('#alerts-add-email-btn')
+    this.maxEmails = isPremium ? Infinity : 1
     this.init()
   }
 
@@ -27,8 +28,8 @@ export class EmailRecipientsManager {
    * Bind event listeners
    */
   bindEvents () {
-    // Add email button click
-    this.container.on('click', '.add-email-btn', (e) => {
+    // Add email button click (external button outside the container)
+    this.addButton.on('click', (e) => {
       e.preventDefault()
       this.addEmailInput()
     })
@@ -88,7 +89,9 @@ export class EmailRecipientsManager {
     const row = jQuery(`
       <div class="email-input-row" data-index="${index}">
         <input type="email" name="emails[]" value="${email}" />
-        <button type="button" class="btn btn-outline-danger btn-sm remove-email-btn" title="${t('remove_this_email')}">-</button>
+        <button type="button" class="alerts-remove-email-btn remove-email-btn" title="${t('remove_this_email')}">
+          <i class="fa-solid fa-trash"></i>
+        </button>
       </div>
     `)
 
@@ -102,21 +105,8 @@ export class EmailRecipientsManager {
     const rows = this.container.find('.email-input-row')
     const totalRows = rows.length
 
-    // Remove all add buttons first
-    rows.find('.add-email-btn').remove()
-
-    // Add the + button to the first row only
-    const firstRow = rows.first()
-    if (firstRow.length) {
-      let addButton = firstRow.find('.add-email-btn')
-      if (addButton.length === 0) {
-        addButton = jQuery(`<button type="button" class="btn btn-outline-primary btn-sm add-email-btn" title="${t('add_another_email')}">+</button>`)
-        firstRow.append(addButton)
-      }
-
-      // Disable add button if we've reached the max
-      addButton.prop('disabled', totalRows >= this.maxEmails)
-    }
+    // Update external add button
+    this.addButton.prop('disabled', totalRows >= this.maxEmails)
 
     // Update remove buttons
     rows.each((index, row) => {
@@ -214,6 +204,7 @@ export class EmailRecipientsManager {
    */
   setEnabled (enabled) {
     this.container.find('input[type="email"]').prop('disabled', !enabled)
-    this.container.find('.add-email-btn, .remove-email-btn').prop('disabled', !enabled)
+    this.container.find('.remove-email-btn').prop('disabled', !enabled)
+    this.addButton.prop('disabled', !enabled)
   }
 }

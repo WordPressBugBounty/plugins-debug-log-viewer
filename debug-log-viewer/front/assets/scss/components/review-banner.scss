@@ -1,14 +1,16 @@
+@use "../constants" as *;
+
 // Modern Review Banner Component - Compact design
 .dbg-lv-review-banner {
 	margin: 15px 15px 15px;
 	
 	.review-card {
-		background: #fff;
+		background: $surface-color;
 		border-radius: 8px;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 		padding: 16px 20px;
 		position: relative;
-		border-left: 3px solid #667eea;
+		border-left: 3px solid $gradient-pro-start;
 		transition: all 0.3s ease;
 
 		&:hover {
@@ -28,14 +30,14 @@
 		flex-shrink: 0;
 		width: 36px;
 		height: 36px;
-		background: linear-gradient(135deg, #0d6efd 0%, #4c84ff 100%);
+		background: linear-gradient(135deg, $main-theme-color 0%, $gradient-primary-end 100%);
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		color: white;
+		color: $white;
 		font-size: 14px;
-		box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
+		box-shadow: 0 2px 6px rgba($gradient-pro-start, 0.25);
 	}
 
 	.review-message {
@@ -45,14 +47,14 @@
 	.review-title {
 		font-size: 0.95rem;
 		font-weight: 600;
-		color: #2c3e50;
+		color: $text-body;
 		margin: 0 0 4px 0;
 		line-height: 1.3;
 	}
 
 	.review-description {
 		font-size: 0.8rem;
-		color: #6c757d;
+		color: $text-secondary;
 		margin: 0;
 		line-height: 1.3;
 	}
@@ -72,18 +74,18 @@
 	}
 
 	.review-separator {
-		color: #dee2e6;
+		color: $border-muted;
 		font-size: 0.75rem;
 	}
 
 	.review-text-link {
 		font-size: 0.75rem;
-		color: #adb5bd;
+		color: $text-muted;
 		text-decoration: none;
 		transition: color 0.2s ease;
 
 		&:hover {
-			color: #6c757d;
+			color: $text-secondary;
 			text-decoration: underline;
 		}
 	}
@@ -102,33 +104,33 @@
 		cursor: pointer;
 
 		&:focus {
-			outline: 2px solid #667eea;
+			outline: 2px solid $gradient-pro-start;
 			outline-offset: 2px;
 		}
 
 		&.btn-primary {
-			background: linear-gradient(135deg, #0d6efd 0%, #4c84ff 100%);
-			color: white;
+			background: linear-gradient(135deg, $main-theme-color 0%, $gradient-primary-end 100%);
+			color: $white;
 
 			&:hover {
-				background: linear-gradient(135deg, #0d6efd 0%, #4c84ff 100%);
+				background: linear-gradient(135deg, $main-theme-color 0%, $gradient-primary-end 100%);
 				transform: translateY(-1px);
-				box-shadow: 0 2px 6px rgba(102, 126, 234, 0.25);
-				color: white;
+				box-shadow: 0 2px 6px rgba($gradient-pro-start, 0.25);
+				color: $white;
 				text-decoration: none;
 			}
 		}
 
 		&.btn-outline-secondary {
-			color: #6c757d;
-			border-color: #dee2e6;
-			background: #f8f9fa;
+			color: $text-secondary;
+			border-color: $border-muted;
+			background: $surface-light;
 			font-size: 0.7rem;  // Make "Maybe Later" button smaller
 
 			&:hover {
-				color: #495057;
-				border-color: #adb5bd;
-				background: #e9ecef;
+				color: $text-body;
+				border-color: $text-muted;
+					background: $border-muted;
 				text-decoration: none;
 			}
 		}
@@ -144,7 +146,7 @@
 		right: 8px;
 		background: none;
 		border: none;
-		color: #adb5bd;
+		color: $text-muted;
 		cursor: pointer;
 		font-size: 12px;
 		padding: 3px;
@@ -157,12 +159,12 @@
 		justify-content: center;
 
 		&:hover {
-			color: #6c757d;
-			background: #f8f9fa;
+			color: $text-secondary;
+			background: $surface-light;
 		}
 
 		&:focus {
-			outline: 2px solid #667eea;
+			outline: 2px solid $gradient-pro-start;
 			outline-offset: 1px;
 		}
 	}

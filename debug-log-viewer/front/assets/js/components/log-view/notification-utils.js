@@ -1,10 +1,10 @@
 /* global jQuery, ajaxurl, dbg_lv_backend_data */
 import { showToast, t } from '../../utils.js'
-import { ScheduleManager } from '../schedule-manager.js'
 import { EmailRecipientsManager } from './email-recipients-manager.js'
+import { ScheduleManager } from '../schedule-manager.js'
 
-const scheduleManager = new ScheduleManager('next-email-info', 'dbg_lv_get_alert_schedule')
 let emailRecipientsManager = null
+let alertScheduleManager = null
 
 /**
  * Updates email notification settings
@@ -15,7 +15,7 @@ let emailRecipientsManager = null
 export async function updateEmailNotifications (form, action) {
   const notificationStatus = form.attr('data-alerts-enabled')
   const recurrenceField = form.find('select[name="recurrence"]')
-  const testEmailCheckbox = form.find('input[name="send_test_email"]')
+  const testEmailBtn = form.find('#send-test-email-btn')
   const submitButton = form.find('input[type="submit"]')
   const errorLevelCheckboxes = form.find('input[name="levels[]"]')
 
@@ -65,14 +65,11 @@ export async function updateEmailNotifications (form, action) {
 
       form.attr('data-alerts-enabled', 'false')
       submitButton
-        .removeClass('disable btn-danger')
+        .removeClass('disable btn-outline-danger')
         .addClass('enable btn-primary')
         .val('Enable')
 
       showToast(t('notifications_disabled'), 'success')
-
-      // Hide schedule display
-      scheduleManager.hide()
 
       const userEmailResponse = await jQuery.post(ajaxurl, {
         action: 'dbg_lv_get_current_user_email',
@@ -84,7 +81,10 @@ export async function updateEmailNotifications (form, action) {
       }
       emailRecipientsManager.setEnabled(true)
       recurrenceField.prop('disabled', false)
-      testEmailCheckbox.prop('disabled', false).closest('.form-check').show()
+      testEmailBtn.prop('disabled', false).closest('.alert-test-card').show()
+
+      // Hide next-run banner when alerts are disabled
+      alertScheduleManager.hide()
 
       // Only enable error level checkboxes if they're not pro-disabled
       errorLevelCheckboxes.each(function () {
@@ -101,7 +101,6 @@ export async function updateEmailNotifications (form, action) {
         recurrence: recurrenceField?.val(),
         emails,
         levels: selectedLevels,
-        send_test_email: +testEmailCheckbox?.is(':checked'),
         wp_nonce: dbg_lv_backend_data.ajax_nonce
       })
 
@@ -111,22 +110,22 @@ export async function updateEmailNotifications (form, action) {
 
       emailRecipientsManager.setEnabled(false)
       recurrenceField.prop('disabled', true)
-      testEmailCheckbox.prop('disabled', true).closest('.form-check').hide()
+      testEmailBtn.prop('disabled', true).closest('.alert-test-card').hide()
+
+      // Show next-run banner after enabling
+      await alertScheduleManager.updateScheduleDisplay()
 
       // Always disable error level checkboxes when notifications are enabled
       errorLevelCheckboxes.prop('disabled', true)
 
       submitButton
         .removeClass('enable btn-primary')
-        .addClass('disable btn-danger')
+        .addClass('disable btn-outline-danger')
         .val(t('disable'))
 
       form.attr('data-alerts-enabled', 'true')
 
       showToast(t('notifications_enabled'), 'success')
-
-      // Show and update schedule display
-      scheduleManager.show()
     }
   } catch (error) {
     showToast(error, 'error')
@@ -146,10 +145,11 @@ export async function initEmailNotificationsForm (form) {
     return
   }
 
-  emailRecipientsManager = new EmailRecipientsManager()
+  emailRecipientsManager = new EmailRecipientsManager('#email-recipients-container', form.data('isPremium'))
+  alertScheduleManager = new ScheduleManager('alerts-next-run', 'dbg_lv_get_alert_schedule')
 
   const recurrenceField = form.find('select[name="recurrence"]')
-  const testEmailCheckbox = form.find('input[name="send_test_email"]')
+  const testEmailBtn = form.find('#send-test-email-btn')
   const submitButton = form.find('input[type="submit"]')
   const errorLevelCheckboxes = form.find('input[name="levels[]"]')
 
@@ -162,16 +162,15 @@ export async function initEmailNotificationsForm (form) {
       form.removeClass('loading')
       emailRecipientsManager.setEnabled(false)
       recurrenceField.prop('disabled', true)
-      testEmailCheckbox.prop('disabled', true).closest('.form-check').hide()
+      testEmailBtn.prop('disabled', true).closest('.alert-test-card').hide()
       errorLevelCheckboxes.prop('disabled', true)
       submitButton
         .prop('disabled', false)
         .removeClass('enabled btn-primary')
-        .addClass('disable btn-danger')
+        .addClass('disable btn-outline-danger')
         .val(t('disable'))
+      await alertScheduleManager.updateScheduleDisplay()
 
-      // Show schedule display for enabled alerts
-      scheduleManager.show()
     } else {
       // For disabled alerts, check if we have existing emails from the template
       const existingEmails = emailRecipientsManager.getEmails()
@@ -194,7 +193,7 @@ export async function initEmailNotificationsForm (form) {
       form.removeClass('loading')
       emailRecipientsManager.setEnabled(true)
       recurrenceField.prop('disabled', false)
-      testEmailCheckbox.prop('disabled', false).closest('.form-check').show()
+      testEmailBtn.prop('disabled', false).closest('.alert-test-card').show()
 
       // Only enable error level checkboxes if they're not pro-disabled
       errorLevelCheckboxes.each(function () {
@@ -207,11 +206,9 @@ export async function initEmailNotificationsForm (form) {
 
       submitButton
         .prop('disabled', false)
-        .removeClass('disable btn-danger')
+        .removeClass('disable btn-outline-danger')
         .addClass('enable btn-primary').val(t('enable'))
 
-      // Hide schedule display for disabled alerts
-      scheduleManager.hide()
     }
   } catch (error) {
     // Remove loading state and enable basic form functionality on error
@@ -219,4 +216,31 @@ export async function initEmailNotificationsForm (form) {
     submitButton.prop('disabled', false).val(t('enable'))
     showToast(error, 'error')
   }
+
+  testEmailBtn.on('click', async function () {
+    const emails = emailRecipientsManager.getEmails()
+    if (emails.length === 0) {
+      showToast(t('email_is_not_specified'), 'warning')
+      return
+    }
+
+    testEmailBtn.prop('disabled', true).addClass('loading')
+
+    try {
+      const response = await jQuery.post(ajaxurl, {
+        action: 'dbg_lv_send_test_alert_email',
+        emails,
+        wp_nonce: dbg_lv_backend_data.ajax_nonce
+      })
+
+      if (!response.success) {
+        throw new Error(response.data)
+      }
+      showToast(response.data, 'success')
+    } catch (error) {
+      showToast(error, 'error')
+    } finally {
+      testEmailBtn.prop('disabled', false).removeClass('loading')
+    }
+  })
 }

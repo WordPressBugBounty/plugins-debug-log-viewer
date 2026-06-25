@@ -1,3 +1,5 @@
+@use "../constants" as *;
+
 // Plan Badge Component
 .plan-badge-container {
 	display: flex;
@@ -15,7 +17,7 @@
 	font-weight: 500;
 	text-decoration: none;
 	transition: all 0.2s ease;
-	border: 1px solid #e5e7eb;
+	border: 1px solid $border-muted;
 	cursor: pointer;
     position: relative;
     top: -8px;
@@ -25,11 +27,11 @@
 	}
 
 	&.plan-badge-pro {
-		background: #fff;
+		background: $surface-color;
 		cursor: default;
-        color: #444;
+        color: $text-body;
 		i {
-			color: #2c79fe;
+			color: $main-theme-color;
 		}
         &:hover {
             transform: scale(1.02);
@@ -37,10 +39,10 @@
 	}
 
 	&.plan-badge-free {
-		background: #fff;
-		color: #444;
+		background: $surface-color;
+		color: $text-body;
         i {
-            color: #2c79fe;
+            color: $main-theme-color;
         }
 		&:hover {
 			transform: scale(1.02);

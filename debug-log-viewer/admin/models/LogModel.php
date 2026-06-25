@@ -21,15 +21,19 @@ class LogModel
 	const LOG_LEVEL_DEPRECATED = 'Deprecated';
 	const LOG_LEVEL_CUSTOM     = 'Custom';
 
-	const LAST_POSITION_OPTION_NAME    = 'dbg_lv_log_last_position';
-	const LOG_UPDATES_MODE_OPTION_NAME = 'dbg_lv_log_updates_mode';
-	const DATETIME_FORMAT_OPTION_NAME  = 'dbg_lv_datetime_format';
-	const TIMEZONE_OPTION_NAME         = 'dbg_lv_timezone';
-	const GROUP_ENTRIES_OPTION_NAME    = 'dbg_lv_group_entries';
-	const DATETIME_FORMAT_ABSOLUTE     = 'ABSOLUTE';
-	const DATETIME_FORMAT_RELATIVE     = 'RELATIVE';
-	const LOG_FILE_LIMIT               = 10 * 1024 * 1024; // 10 MB
-	const LOG_UPDATES_INTERVAL         = 10; // 10 seconds
+	const LAST_POSITION_OPTION_NAME        = 'dbg_lv_log_last_position';
+	const LOG_UPDATES_MODE_OPTION_NAME     = 'dbg_lv_log_updates_mode';
+	const DATETIME_FORMAT_OPTION_NAME      = 'dbg_lv_datetime_format';
+	const TIMEZONE_OPTION_NAME             = 'dbg_lv_timezone';
+	const GROUP_ENTRIES_OPTION_NAME        = 'dbg_lv_group_entries';
+	const AUTO_REFRESH_INTERVAL_OPTION     = 'dbg_lv_auto_refresh_interval';
+	const SCROLL_MODE_OPTION_NAME          = 'dbg_lv_scroll_mode';
+	const SCROLL_MODE_PAGINATION           = 'PAGINATION';
+	const SCROLL_MODE_INFINITE             = 'INFINITE';
+	const DATETIME_FORMAT_ABSOLUTE         = 'ABSOLUTE';
+	const DATETIME_FORMAT_RELATIVE         = 'RELATIVE';
+	const LOG_FILE_LIMIT                   = 10 * 1024 * 1024; // 10 MB
+	const DEFAULT_AUTO_REFRESH_INTERVAL    = 5;  // 5 seconds
 
 	// File size units constants
 	const UNIT_BYTES      = 'bytes';

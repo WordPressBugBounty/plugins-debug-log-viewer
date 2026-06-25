@@ -1,0 +1,105 @@
+@use "../constants" as *;
+
+// ── Settings-card mixin ────────────────────────────────────────────
+// Outputs the full settings-card pattern scoped to the calling selector.
+// Both the Settings tab and the Cleanup tab include this mixin with their
+// own spacing/sizing arguments so the markup classes remain identical.
+//
+// @param {Length}      $section-margin  - margin-top/-bottom for .settings-section   [2rem]
+// @param {Length}      $grid-gap        - gap for .settings-cards-grid                [1rem]
+// @param {String}      $card-padding    - padding for .settings-card-body             [1.25rem 1.25rem 1rem 1.25rem]
+// @param {Length|null} $title-size      - font-size for .settings-card-title          [null = inherited]
+// @param {Length}      $desc-size       - font-size for .settings-card-desc           [13px]
+// @param {Number|null} $desc-lh         - line-height for .settings-card-desc         [null = inherited]
+
+@mixin settings-cards(
+	$section-margin: 2rem,
+	$grid-gap: 1rem,
+	$card-padding: 1.25rem 1.25rem 1rem 1.25rem,
+	$title-size: null,
+	$desc-size: 13px,
+	$desc-lh: null
+) {
+	.settings-section {
+		margin-top: $section-margin;
+		margin-bottom: $section-margin;
+
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+
+	.settings-cards-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: $grid-gap;
+
+		&.settings-cards-grid--full {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	.settings-card {
+		background: $surface-color;
+		border-radius: 5px;
+		box-shadow: $card-box-shadow;
+		overflow: hidden;
+		display: flex;
+		flex-direction: column;
+
+		.settings-card-body {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			padding: $card-padding;
+			flex: 1;
+		}
+
+		.settings-card-icon-wrap {
+			width: 44px;
+			height: 44px;
+			min-width: 44px;
+			background: $surface-blue-tint;
+			border-radius: 5px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			align-self: flex-start;
+
+			i {
+				font-size: 18px;
+				color: $main-theme-color;
+			}
+		}
+
+		.settings-card-info {
+			flex: 1;
+			min-width: 0;
+
+			.settings-card-title {
+				font-weight: 600;
+				@if $title-size { font-size: $title-size; }
+					color: $text-heading;
+				margin-bottom: 3px;
+			}
+
+			.settings-card-desc {
+					color: $text-secondary;
+				font-size: $desc-size;
+				@if $desc-lh { line-height: $desc-lh; }
+			}
+		}
+
+		.settings-card-control {
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			position: relative;
+			
+			.pro-badge {
+				top: -10px;
+				right: -10px;
+			}
+		}
+	}
+}
