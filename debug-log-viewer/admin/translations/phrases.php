@@ -26,7 +26,6 @@ class Phrases {
 				'display_errors'               => __('Display Errors:', 'debug-log-viewer'),
 				'flush_log_confirmation'       => __('Are you sure? This action cannot be undone after flushing the log.', 'debug-log-viewer'),
 				'log_was_cleared'              => __('Log cleared', 'debug-log-viewer'),
-				'log_was_refreshed'            => __('Log refreshed', 'debug-log-viewer'),
 				'email_is_not_specified'       => __('Enter at least one email address', 'debug-log-viewer'),
 				'notifications_disabled'       => __('Alerts disabled', 'debug-log-viewer'),
 				'disable'                      => __('Disable', 'debug-log-viewer'),
@@ -80,7 +79,6 @@ class Phrases {
 				'years_ago'                    => __('%d years ago', 'debug-log-viewer'),
 
 				// Email validation phrases
-				'add_another_email'            => __('Add another email', 'debug-log-viewer'),
 				'remove_this_email'            => __('Remove this email', 'debug-log-viewer'),
 				'at_least_one_email_required'  => __('At least one email address is required', 'debug-log-viewer'),
 				/* translators: %d: email number/position in the list */
@@ -134,6 +132,7 @@ class Phrases {
 				'description'                  => __('Description', 'debug-log-viewer'),
 				'file'                         => __('File', 'debug-log-viewer'),
 				'line'                         => __('Line', 'debug-log-viewer'),
+				'invalid_regex'                => __('Invalid regular expression', 'debug-log-viewer'),
 
 				'remind_in_a_week'			   => __('Remind in a week', 'debug-log-viewer')
 			];

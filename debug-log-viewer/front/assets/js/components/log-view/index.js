@@ -26,15 +26,71 @@ import { initLogPanels, appendPublicAccessWarning } from '../log-popover-rendere
   const isGroupingOnInit = dbg_lv_backend_data.group_entries !== '0'
   table.column(3).visible(isGroupingOnInit)
 
-  $('.right-subheader .search-input').on('input', function () {
-    const searchValue = $(this).val().trim()
+  // Search functionality with mode support
+  let searchMode = {
+    smart: true, // Default: smart search enabled
+    regex: false
+  }
 
-    if (searchValue) {
-      table.search(searchValue).draw()
-    } else {
-      table.search('').draw()
+  function performSearch() {
+    const searchValue = $('#dbg_lv_search_input').val().trim()
+
+    if (!searchValue) {
+      table.search('', false, false).draw()
+      return
     }
+
+    // Validate regex if regex mode is enabled
+    if (searchMode.regex) {
+      try {
+        new RegExp(searchValue)
+      } catch (e) {
+        showToast(t('invalid_regex') || 'Invalid regular expression', 'error')
+        return
+      }
+    }
+
+    // Apply search with appropriate mode
+    // DataTables.search(searchString, regex, smart, caseInsensitive)
+    table.search(searchValue, searchMode.regex, searchMode.smart, true).draw()
+  }
+
+  // Search input handler
+  $('#dbg_lv_search_input').on('input', performSearch)
+
+  // Toggle smart search
+  $('#dbg_lv_search_smart').on('click', function (e) {
+    e.preventDefault()
+    searchMode.smart = !searchMode.smart
+    $(this).toggleClass('active', searchMode.smart)
+    performSearch()
   })
+
+  // Toggle regex search (Pro only)
+  $('#dbg_lv_search_regex').on('click', function (e) {
+    e.preventDefault()
+    
+    // Double-check it's not the disabled Pro badge button
+    if ($(this).hasClass('pro-disabled')) {
+      return
+    }
+    
+    searchMode.regex = !searchMode.regex
+    $(this).toggleClass('active', searchMode.regex)
+    
+    // When regex is enabled, disable smart search (they're mutually exclusive in DataTables)
+    if (searchMode.regex) {
+      searchMode.smart = false
+      $('#dbg_lv_search_smart').removeClass('active').prop('disabled', true)
+    } else {
+      $('#dbg_lv_search_smart').prop('disabled', false)
+    }
+    
+    performSearch()
+  })
+
+  // Initialize: Set smart search as active by default
+  $('#dbg_lv_search_smart').addClass('active')
 
   const apiService = new LogViewerApiService(table)
   const uiUtils = new LogViewerUI(table)

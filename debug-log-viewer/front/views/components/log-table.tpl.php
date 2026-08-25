@@ -5,6 +5,7 @@ if (!defined('ABSPATH')) {
 }
 
 use DebugLogViewer\Admin\Models\LogModel;
+use DebugLogViewer\Admin\Controllers\FreemiusController;
 
 $dbg_lv_file_exists = file_exists($dbg_lv_path);
 
@@ -165,7 +166,15 @@ foreach ($dbg_lv_warnings as $dbg_lv_w) {
 		</div>
 		<div class="search-input-wrapper">
 			<i class="fa-solid fa-magnifying-glass search-icon"></i>
-			<input type="search" placeholder="<?php esc_attr_e('Search in log...', 'debug-log-viewer') ?>" class="text-input search-input">
+			<input id="dbg_lv_search_input" type="search" aria-label="<?php esc_attr_e('Search in log', 'debug-log-viewer'); ?>" placeholder="<?php esc_attr_e('Search in log...', 'debug-log-viewer') ?>" class="text-input search-input <?php echo FreemiusController::is_premium() ? 'has-two-toggles' : 'has-one-toggle'; ?>">
+			<button id="dbg_lv_search_smart" class="search-mode-toggle" data-mode="smart" title="<?php esc_attr_e('Smart search: space-separated words in any order', 'debug-log-viewer'); ?>" aria-label="<?php esc_attr_e('Toggle smart search', 'debug-log-viewer'); ?>">
+				<i class="fa-solid fa-font"></i>
+			</button>
+			<?php if (FreemiusController::is_premium()): ?>
+				<button id="dbg_lv_search_regex" class="search-mode-toggle" data-mode="regex" title="<?php esc_attr_e('Regular expression search', 'debug-log-viewer'); ?>" aria-label="<?php esc_attr_e('Toggle regex search', 'debug-log-viewer'); ?>">
+					<i class="fa-solid fa-asterisk"></i>
+				</button>
+			<?php endif; ?>
 		</div>
 	</div>
 

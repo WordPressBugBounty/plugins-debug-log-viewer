@@ -54,6 +54,7 @@ if (!defined('ABSPATH')) {
 									<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Infinite scroll log view mode', 'debug-log-viewer'); ?></li>
 									<li class="mb-2"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Advanced cleanup controls (size, schedule, method, retention)', 'debug-log-viewer'); ?></li>
 									<li class="mb-0"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Cleanup history and cleanup email notifications', 'debug-log-viewer'); ?></li>
+									<li class="mb-0"><i class="fas fa-check text-success me-2"></i><?php esc_html_e('Regular Expression search support', 'debug-log-viewer'); ?></li>
 								</ul>
 							</div>
 						</div>

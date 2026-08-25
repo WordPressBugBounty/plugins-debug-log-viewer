@@ -306,6 +306,63 @@
 				border-color: $border-color;
 				box-shadow: $block-box-shadow;
 				height: 38px;
+				border-radius: 5px;
+
+				// Free plan: one toggle button (smart search only)
+				&.has-one-toggle {
+					padding-right: 40px;
+				}
+
+				// Pro plan: two toggle buttons (smart + regex)
+				&.has-two-toggles {
+					padding-right: 70px;
+				}
+			}
+
+			.search-mode-toggle {
+				position: absolute;
+				background: transparent;
+				border: none;
+				color: $text-secondary;
+				cursor: pointer;
+				padding: 6px 8px;
+				border-radius: 4px;
+				font-size: 0.85em;
+				transition: all 0.2s ease;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				height: 28px;
+				width: 28px;
+
+				&:hover:not(:disabled) {
+					background-color: rgba($text-secondary, 0.1);
+					color: $text-body;
+				}
+
+				&.active {
+					background-color: rgba($text-secondary, 0.15);
+					color: $text-body;
+
+					&:hover {
+						background-color: rgba($text-secondary, 0.2);
+					}
+				}
+
+				// Smart search button positioning
+				&#dbg_lv_search_smart {
+					right: 6px; // Default when it's the only button (Free)
+				}
+
+				// Regex button (Pro only)
+				&#dbg_lv_search_regex {
+					right: 6px;
+				}
+			}
+
+			// When both buttons exist (Pro), adjust smart button position
+			.has-two-toggles ~ #dbg_lv_search_smart {
+				right: 36px;
 			}
 		}
 

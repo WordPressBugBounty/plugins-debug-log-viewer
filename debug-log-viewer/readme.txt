@@ -1,10 +1,10 @@
 === Debug Log Viewer ===
 
 Contributors: lysyiweb
-Tags: debug, debugging, debug log, error log, developer tools
+Tags: log, debugging, error log, debug, developer tools
 Requires at least: 5.8
-Tested up to: 7.0
-Stable tag: 2.4
+Tested up to: 7.1
+Stable tag: 2.5.2
 Requires PHP: 7.2
 License: GPLv2 or later
 
@@ -14,87 +14,58 @@ Effortlessly view, search, filter and manage your WordPress debug.log in the adm
 
 = Debug Log Viewer: Your Essential WordPress Debugging Tool =
 
-Tired of struggling to access and understand your WordPress debug.log
-file?
+Tired of struggling to access and understand your WordPress debug.log file?
 
-Debug Log Viewer simplifies WordPress debugging by providing a
-user-friendly interface to view, search, and manage your debug.log
-directly within your WordPress admin area.
+Debug Log Viewer simplifies WordPress debugging by providing a user-friendly interface to view, search, and manage your debug.log directly within your WordPress admin area.
 
-It is designed for WordPress developers, site administrators,
-freelancers, and anyone who needs to quickly identify and resolve
-website issues.
+It is designed for WordPress developers, site administrators, freelancers, and anyone who needs to quickly identify and resolve website issues.
 
-Debug Log Viewer helps you find errors faster without using FTP, hosting
-panels, or manually opening log files.
+Debug Log Viewer helps you find errors faster without using FTP, hosting panels, or manually opening log files.
 
 = Gain Real-Time Insights into Your WordPress Site Health =
 
-Monitor errors, warnings, and deprecated function notices in real-time.
-Debug Log Viewer helps you identify problems early and maintain a more
-stable WordPress environment.
+Monitor errors, warnings, and deprecated function notices in real-time. Debug Log Viewer helps you identify problems early and maintain a more stable WordPress environment.
 
 = Key Features for Efficient WordPress Debugging =
 
--   Real-Time Log Viewer: Monitor your WordPress debug.log file in
-    real-time, directly from your WordPress dashboard. No more hunting
-    for files via FTP or cPanel!
--   Easy Debug Log Access: Access and view your full debug log within a
-    clean and intuitive interface.
--   Search and Filtering: Quickly find specific log entries with
-    powerful search and filtering options. Filter by error type,
-    keywords, and date range (Pro).
--   Pagination: Navigate through large debug logs with ease using
-    pagination, ensuring smooth performance even with extensive logs.
--   Email Alerts for Errors: Get email alerts when new errors are
-    logged. Pro users can customize error severity levels and
-    recipients.
+-   Real-Time Log Viewer: Monitor your WordPress debug.log file in real-time, directly from your WordPress dashboard. No more hunting for files via FTP or cPanel!
+-   Easy Debug Log Access: Access and view your full debug log within a clean and intuitive interface.
+-   Smart Search: Find log entries quickly with intelligent search that matches space-separated words in any order.
+-   Advanced Search & Filtering: Quickly find specific log entries with powerful search and filtering options. Filter by error type, keywords, and date range (Pro). Use regular expressions for complex search patterns (Pro).
+-   Pagination: Navigate through large debug logs with ease using pagination, ensuring smooth performance even with extensive logs.
+-   Email Alerts for Errors: Get email alerts when new errors are logged. Pro users can customize error severity levels and recipients.
 
 = Flexible Settings Panel =
 
--   Control WP_DEBUG Constants: Enable or disable WP_DEBUG and
-    WP_DEBUG_LOG constants directly from the plugin settings.
--   Customize Logging Options: Configure your debug log settings to
-    match your needs.
--   Custom Log Path Support: Automatically detect and read custom
-    debug.log locations.
+-   Control WP_DEBUG Constants: Enable or disable WP_DEBUG and WP_DEBUG_LOG constants directly from the plugin settings.
+-   Customize Logging Options: Configure your debug log settings to match your needs.
+-   Custom Log Path Support: Automatically detect and read custom debug.log locations.
 
 = Benefits of Using Debug Log Viewer =
 
--   Save Time and Effort: Stop manually accessing and parsing your debug
-    log file.
--   Faster Error Detection: Monitor errors as they happen and reduce
-    troubleshooting time.
--   Simplified Troubleshooting: Quickly identify the source of errors
-    and warnings.
+-   Save Time and Effort: Stop manually accessing and parsing your debug log file.
+-   Faster Error Detection: Monitor errors as they happen and reduce troubleshooting time.
+-   Simplified Troubleshooting: Quickly identify the source of errors and warnings.
 
 = Debug Log Viewer Pro Features =
 
-Upgrade to Pro and get advanced tools for professional WordPress
-debugging and site maintenance:
+Upgrade to Pro and get advanced tools for professional WordPress debugging and site maintenance:
 
--   Advanced Email Alerts: Choose error levels and send notifications to
-    multiple recipients.
--   CSV Export: Export debug log entries for analysis, reporting, or
-    sharing.
--   Custom Date Range Filtering: Analyze logs from specific time
-    periods.
--   Infinite Scroll Log Viewer: Browse large log files smoothly without
-    pagination interruptions.
--   Advanced Log Cleanup Controls: Manage debug.log size with custom
-    limits, schedules, cleanup methods, and retention settings.
--   Cleanup History: Review previous cleanup actions and track log
-    maintenance.
+-   Regular Expression Search: Use powerful regex patterns to find complex log entries and patterns.
+-   Advanced Email Alerts: Choose error levels and send notifications to multiple recipients.
+-   CSV Export: Export debug log entries for analysis, reporting, or sharing.
+-   Custom Date Range Filtering: Analyze logs from specific time periods.
+-   Infinite Scroll Log Viewer: Browse large log files smoothly without pagination interruptions.
+-   Advanced Log Cleanup Controls: Manage debug.log size with custom limits, schedules, cleanup methods, and retention settings.
+-   Cleanup History: Review previous cleanup actions and track log maintenance.
 
 = Why choose Debug Log Viewer Pro? =
 
 Managing WordPress errors is not only about viewing logs.
 
-Large debug files can consume disk space, become difficult to analyze,
-and slow down troubleshooting.
+Large debug files can consume disk space, become difficult to analyze, and slow down troubleshooting.
 
-Pro gives you automation tools to monitor, export, filter, and maintain
-your debug logs efficiently.
+Pro gives you automation tools to monitor, export, filter, and maintain your debug logs efficiently.
 
 = Who is Debug Log Viewer For? =
 
@@ -117,6 +88,12 @@ your debug logs efficiently.
 4. Cleanup page
 
 == Changelog ==
+
+= 2.5.2 =
+* Updated dependencies
+* Added Smart Search: Intelligent search that matches space-separated words in any order
+* Added Regular Expression Search for advanced pattern matching (Pro feature)
+
 
 = 2.4 =
 * UI and design improvements
